@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Quick POS</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<link rel="stylesheet" href="style-pos.css">
+</head>
+<body>
+
+<!-- ── TOP BAR ─────────────────────────────── -->
+<div id="topbar">
+  <span id="topbar-title"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/><path d="M2 2h2l2.6 12.59a2 2 0 0 0 2 1.61h8.6a2 2 0 0 0 2-1.61L23 6H6"/></svg> ขายสินค้า</span>
+  <span class="badge badge-teal" id="pos-bill-no" style="display:none">—</span>
+  <button class="btn btn-secondary btn-sm" id="topbar-action" style="display:none"></button>
+</div>
+
+<!-- ── PAGE CONTAINER ──────────────────────── -->
+<div id="page-container">
+
+  <!-- ════ POS ════════════════════════════════ -->
+  <div class="page active" id="page-pos">
+    <div id="pos-search-bar">
+      <div id="pos-search-wrap">
+        <input type="text" id="pos-search-input" placeholder="ชื่อ, รหัสสินค้า หรือ Barcode" oninput="filterPosProducts()" onkeydown="if(event.key==='Enter')addFirstResult()">
+        <button class="btn btn-secondary" id="pos-scan-btn" onclick="scanBarcode()" title="สแกนบาร์โค้ด (กล้องสด)"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M4 8a2 2 0 0 1 2-2h1.5l1-1.5h6l1 1.5H18a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="3.5"/></svg></button>
+        <button class="btn btn-secondary" id="pos-photo-btn" onclick="document.getElementById('pos-photo-input').click()" title="ถ่าย/เลือกรูปบาร์โค้ด"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></button>
+        <input type="file" id="pos-photo-input" accept="image/*" capture="environment" style="display:none" onchange="scanBarcodeFromPhoto(event)">
+      </div>
+    </div>
+    <div id="pos-cat-scroll"></div>
+    <div id="pos-product-scroll">
+      <div class="product-grid" id="pos-product-grid"></div>
+    </div>
+  </div>
+
+  <!-- ════ PRODUCTS ════════════════════════════ -->
+  <div class="page" id="page-products">
+    <div class="page-body">
+      <div class="filter-row">
+        <input type="text" id="prod-search" placeholder="ค้นหา..." oninput="renderProducts()">
+        <select id="prod-cat-filter" onchange="renderProducts()">
+          <option value="">ทุกหมวด</option>
+        </select>
+        <select id="prod-stock-filter" onchange="renderProducts()">
+          <option value="">สต๊อกทั้งหมด</option>
+          <option value="available">มีสต๊อก (ไม่หมด)</option>
+          <option value="low">ใกล้หมด</option>
+          <option value="out">หมดแล้ว</option>
+        </select>
+      </div>
+      <div id="prod-list"></div>
+    </div>
+  </div>
+
+  <!-- ════ PURCHASE ════════════════════════════ -->
+  <div class="page" id="page-purchase">
+    <div class="page-body">
+      <div class="flex-between mb-14">
+        <span style="font-weight:600;font-size:15px"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><rect x="1" y="7" width="14" height="10" rx="1"/><path d="M15 10h4l3 3v4h-7z"/><circle cx="6" cy="19" r="1.5"/><circle cx="17" cy="19" r="1.5"/></svg> รายการสั่งซื้อ</span>
+        <button class="btn btn-secondary btn-sm" onclick="exportPurchaseExcel()"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M12 3v12"/><polyline points="7 11 12 16 17 11"/><line x1="4" y1="20" x2="20" y2="20"/></svg> Excel</button>
+      </div>
+      <div class="date-row">
+        <span>จาก</span>
+        <input type="date" id="pur-date-from">
+        <span>ถึง</span>
+        <input type="date" id="pur-date-to">
+        <button class="btn btn-secondary btn-sm" onclick="renderPurchases()">ค้นหา</button>
+      </div>
+      <div id="pur-list"></div>
+    </div>
+  </div>
+
+  <!-- ════ DEBT ════════════════════════════════ -->
+  <div class="page" id="page-debt">
+    <div class="page-body">
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-label">ยอดค้างชำระ</div><div class="stat-value text-red" id="debt-outstanding">฿0</div></div>
+        <div class="stat-card"><div class="stat-label">บิลค้าง</div><div class="stat-value text-amber" id="debt-bill-count">0</div><div class="stat-sub">รายการ</div></div>
+      </div>
+      <div id="debt-list"></div>
+    </div>
+  </div>
+
+  <!-- ════ REPORTS ═════════════════════════════ -->
+  <div class="page" id="page-reports">
+    <div class="page-body">
+      <div class="tabs" id="report-tabs">
+        <button class="tab-btn active" onclick="switchReportTab('sales')">ยอดขาย</button>
+        <button class="tab-btn" onclick="switchReportTab('stock')">สต๊อก</button>
+        <button class="tab-btn" onclick="switchReportTab('expense')">รายจ่าย</button>
+      </div>
+
+      <!-- Sales tab -->
+      <div id="rtab-sales">
+        <div class="quick-filter">
+          <button class="btn btn-secondary btn-sm" onclick="setDateRange('today','sale')">วันนี้</button>
+          <button class="btn btn-secondary btn-sm" onclick="setDateRange('week','sale')">7 วัน</button>
+          <button class="btn btn-secondary btn-sm" onclick="setDateRange('month','sale')">เดือนนี้</button>
+          <button class="btn btn-secondary btn-sm" onclick="setDateRange('year','sale')">ปีนี้</button>
+        </div>
+        <div class="date-row">
+          <span>จาก</span><input type="date" id="rep-sale-from">
+          <span>ถึง</span><input type="date" id="rep-sale-to">
+          <button class="btn btn-secondary btn-sm" onclick="renderSalesReport()">ค้นหา</button>
+        </div>
+        <div class="stat-grid">
+          <div class="stat-card"><div class="stat-label">ยอดขายรวม</div><div class="stat-value text-teal" id="rs-total">฿0</div></div>
+          <div class="stat-card"><div class="stat-label">กำไรรวม</div><div class="stat-value text-green" id="rs-profit">฿0</div></div>
+          <div class="stat-card"><div class="stat-label">จำนวนบิล</div><div class="stat-value" id="rs-bills">0</div></div>
+          <div class="stat-card"><div class="stat-label">เฉลี่ย/บิล</div><div class="stat-value" id="rs-avg">฿0</div></div>
+        </div>
+        <div class="chart-wrap"><canvas id="salesChart" height="140"></canvas></div>
+
+        <div style="font-weight:600;margin-bottom:10px;font-size:13px;margin-top:14px"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M21 12A9 9 0 1 1 12 3v9z"/><path d="M12 3a9 9 0 0 1 9 9"/></svg> ยอดขายแยกตามหมวดหมู่</div>
+        <div class="chart-wrap"><canvas id="categoryChart" height="180"></canvas></div>
+
+        <div style="font-weight:600;margin-bottom:10px;font-size:13px"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 5H4a2 2 0 0 0 0 4h3"/><path d="M17 5h3a2 2 0 0 1 0 4h-3"/></svg> สินค้าขายดี</div>
+        <div id="rs-top-list"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;margin-top:14px">
+          <span style="font-weight:600;font-size:13px"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M4 2h16v20l-3-2-3 2-3-2-3 2-3-2-1 2z"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="13" y2="15"/></svg> รายละเอียดบิล</span>
+          <button class="btn btn-secondary btn-sm" onclick="exportSalesExcel()"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M12 3v12"/><polyline points="7 11 12 16 17 11"/><line x1="4" y1="20" x2="20" y2="20"/></svg></button>
+        </div>
+        <div id="rs-detail-list"></div>
+
+        <div style="font-weight:600;margin-bottom:10px;font-size:13px;margin-top:20px;padding-top:14px;border-top:1px solid var(--border)"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><line x1="6" y1="20" x2="6" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="18" y1="20" x2="18" y2="14"/></svg> เปรียบเทียบยอดขายระหว่างช่วงเวลา</div>
+        <div class="quick-filter">
+          <button class="btn btn-secondary btn-sm" onclick="setCompareRange('mom')">เดือนนี้ vs เดือนก่อน</button>
+          <button class="btn btn-secondary btn-sm" onclick="setCompareRange('wow')">7วันนี้ vs 7วันก่อน</button>
+        </div>
+        <div class="date-row">
+          <span>ช่วง A</span><input type="date" id="cmp-a-from"><span>ถึง</span><input type="date" id="cmp-a-to">
+        </div>
+        <div class="date-row">
+          <span>ช่วง B</span><input type="date" id="cmp-b-from"><span>ถึง</span><input type="date" id="cmp-b-to">
+        </div>
+        <button class="btn btn-primary btn-sm btn-full" onclick="renderCompareReport()" style="margin-bottom:10px"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> เปรียบเทียบ</button>
+        <div class="stat-grid" id="cmp-stats"></div>
+        <div class="chart-wrap"><canvas id="compareChart" height="140"></canvas></div>
+        <div style="display:flex;justify-content:flex-end;margin:10px 0">
+          <button class="btn btn-secondary btn-sm" onclick="exportCompareExcel()"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M12 3v12"/><polyline points="7 11 12 16 17 11"/><line x1="4" y1="20" x2="20" y2="20"/></svg> Export เปรียบเทียบ</button>
+        </div>
+      </div>
+
+      <!-- Stock tab -->
+      <div id="rtab-stock" style="display:none">
+        <div class="stat-grid">
+          <div class="stat-card"><div class="stat-label">สินค้าทั้งหมด</div><div class="stat-value" id="rst-total">0</div></div>
+          <div class="stat-card"><div class="stat-label">มูลค่าสต๊อก</div><div class="stat-value text-teal" id="rst-value">฿0</div></div>
+          <div class="stat-card"><div class="stat-label">ใกล้หมด</div><div class="stat-value text-amber" id="rst-low">0</div></div>
+          <div class="stat-card"><div class="stat-label">หมดแล้ว</div><div class="stat-value text-red" id="rst-out">0</div></div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+          <button class="btn btn-secondary btn-sm" onclick="exportStockExcel()"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M12 3v12"/><polyline points="7 11 12 16 17 11"/><line x1="4" y1="20" x2="20" y2="20"/></svg> Excel</button>
+        </div>
+        <div id="rst-list"></div>
+      </div>
+
+      <!-- Expense tab -->
+      <div id="rtab-expense" style="display:none">
+        <div class="quick-filter">
+          <button class="btn btn-secondary btn-sm" onclick="setDateRange('today','pur')">วันนี้</button>
+          <button class="btn btn-secondary btn-sm" onclick="setDateRange('week','pur')">7 วัน</button>
+          <button class="btn btn-secondary btn-sm" onclick="setDateRange('month','pur')">เดือนนี้</button>
+        </div>
+        <div class="date-row">
+          <span>จาก</span><input type="date" id="rep-pur-from">
+          <span>ถึง</span><input type="date" id="rep-pur-to">
+          <button class="btn btn-secondary btn-sm" onclick="renderPurchaseReport()">ค้นหา</button>
+        </div>
+        <div class="stat-grid">
+          <div class="stat-card"><div class="stat-label">ซื้อสินค้า</div><div class="stat-value text-red" id="rp-goods">฿0</div></div>
+          <div class="stat-card"><div class="stat-label">รายจ่ายทั่วไป</div><div class="stat-value text-amber" id="rp-expense">฿0</div></div>
+        </div>
+        <div class="stat-card mb-12"><div class="stat-label">รวมรายจ่าย</div><div class="stat-value" id="rp-total">฿0</div></div>
+        <div class="chart-wrap"><canvas id="purChart" height="140"></canvas></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <span style="font-weight:600;font-size:13px"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M4 2h16v20l-3-2-3 2-3-2-3 2-3-2-1 2z"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="13" y2="15"/></svg> รายการ</span>
+          <button class="btn btn-secondary btn-sm" onclick="exportPurchaseRptExcel()"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M12 3v12"/><polyline points="7 11 12 16 17 11"/><line x1="4" y1="20" x2="20" y2="20"/></svg></button>
+        </div>
+        <div id="rp-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ MORE / SETTINGS ═════════════════════ -->
+  <div class="page" id="page-more">
+    <div class="page-body">
+      <!-- Quick actions -->
+      <div class="card mb-12">
+        <div class="card-title">เมนูด่วน</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <button class="btn btn-secondary" onclick="openExpense()"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/></svg> รายจ่าย</button>
+          <button class="btn btn-secondary" onclick="showSubPage('stock-adjust')"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M12 3v18"/><path d="M5 7h14"/><path d="M5 7l-3 7a3.5 3.5 0 0 0 7 0z"/><path d="M19 7l-3 7a3.5 3.5 0 0 0 7 0z"/></svg> ปรับสต๊อก</button>
+          <button class="btn btn-secondary" onclick="showPage('purchase')"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><rect x="1" y="7" width="14" height="10" rx="1"/><path d="M15 10h4l3 3v4h-7z"/><circle cx="6" cy="19" r="1.5"/><circle cx="17" cy="19" r="1.5"/></svg> สั่งซื้อ</button>
+          <button class="btn btn-secondary" onclick="openHoldBillsPage()"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M12 21s7-6.5 7-11a7 7 0 0 0-14 0c0 4.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg> บิลพัก</button>
+        </div>
+        <div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <button class="btn btn-secondary btn-full" onclick="document.getElementById('excelInput').click()">
+            <svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M12 21V9"/><polyline points="7 13 12 8 17 13"/><line x1="4" y1="20" x2="20" y2="20"/></svg> นำเข้า Excel Master Product
+          </button>
+          <button class="btn btn-secondary btn-full" onclick="exportProductsExcel()"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M12 3v12"/><polyline points="7 11 12 16 17 11"/><line x1="4" y1="20" x2="20" y2="20"/></svg> Export สินค้า</button>
+        </div>
+        <input type="file" id="excelInput" accept=".xlsx,.xls" onchange="importExcel(event)">
+        
+        <div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <button class="btn btn-secondary btn-full" onclick="document.getElementById('masterUpdateInput').click()">
+            <svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M4 4v5h5"/><path d="M20 20v-5h-5"/><path d="M4.5 9a8 8 0 0 1 14-3.5L20 9"/><path d="M19.5 15a8 8 0 0 1-14 3.5L4 15"/></svg> อัพเดทชื่อ+หมวดหมู่
+          </button>
+          <button class="btn btn-secondary btn-full" onclick="exportBackupJSON()"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><rect x="2" y="4" width="20" height="4" rx="1"/><path d="M4 8v10a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg> สำรองข้อมูลทั้งหมด</button>
+        </div>
+        <input type="file" id="masterUpdateInput" accept=".xlsx,.xls" style="display:none" onchange="importMasterUpdate(event)">
+
+        <div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <button class="btn btn-secondary btn-full" onclick="document.getElementById('backupInput').click()"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M12 21V9"/><polyline points="7 13 12 8 17 13"/><line x1="4" y1="20" x2="20" y2="20"/></svg> กู้คืนข้อมูล</button>
+        </div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:4px">💡 สำรองข้อมูลเก็บไว้เป็นระยะ เผื่อเบราว์เซอร์ล้างแคชหรือเปลี่ยนเครื่อง</div>
+        <input type="file" id="backupInput" accept=".json" style="display:none" onchange="importBackupJSON(event)">
+      </div>
+
+      <!-- ── CATEGORY MAPPING ── -->
+      <div class="card mb-12">
+        <div class="card-title mapping-card-header" onclick="toggleMappingCard()" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center">
+          <span><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M20 12l-8 8-10-10V4h6z"/><circle cx="7.5" cy="7.5" r="1.2"/></svg> หมวดหมู่สินค้า</span>
+          <span id="mapping-card-chevron" style="font-size:13px;color:var(--text-muted);transition:transform .15s"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><polyline points="6 9 12 15 18 9"/></svg> กดเพื่อดู</span>
+        </div>
+        <div id="mapping-card-body" style="display:none;margin-top:12px">
+          <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px">
+            กำหนดว่ารหัสสินค้าที่ขึ้นต้นด้วยเลขอะไร ให้จัดอยู่ในหมวดหมู่ใด — กด <svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg> ที่แถวเพื่อซ่อนรายการที่ไม่ได้ใช้ (ไม่ลบข้อมูล แค่ซ่อนไว้)
+          </div>
+          <div id="mapping-list"></div>
+          <div class="mapping-add-row">
+            <input type="text" id="mapping-prefix" placeholder="รหัส เช่น 40" inputmode="numeric" maxlength="6" style="min-width:80px;flex:0.5">
+            <input type="text" id="mapping-cat" placeholder="ชื่อหมวดหมู่" style="flex:1">
+            <button class="btn btn-primary" onclick="addMapping()"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> เพิ่ม</button>
+          </div>
+          <button class="btn btn-secondary btn-full" style="margin-top:10px" onclick="recalculateAllCategories()"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M4 4v5h5"/><path d="M20 20v-5h-5"/><path d="M4.5 9a8 8 0 0 1 14-3.5L20 9"/><path d="M19.5 15a8 8 0 0 1-14 3.5L4 15"/></svg> ปรับปรุงหมวดหมู่สินค้าทั้งหมด</button>
+        </div>
+      </div>
+
+      <!-- Settings -->
+      <div class="card mb-12">
+        <div class="card-title"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 0 1-4 0v-.09A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l-.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.55-1H3a2 2 0 0 1 0-4h.09A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.55V3a2 2 0 0 1 4 0v.09A1.7 1.7 0 0 0 15 4.6a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9a1.7 1.7 0 0 0 1.55 1H21a2 2 0 0 1 0 4h-.09a1.7 1.7 0 0 0-1.51 1z"/></svg> ข้อมูลร้านค้า</div>
+        <div class="form-group"><label>ชื่อร้าน</label><input type="text" id="set-store-name"></div>
+        <div class="form-group"><label>ที่อยู่</label><textarea id="set-store-addr" rows="2"></textarea></div>
+        <div class="form-group"><label>เบอร์โทร</label><input type="text" id="set-store-phone"></div>
+        <div class="form-group"><label>Tax ID</label><input type="text" id="set-tax-id"></div>
+        <button class="btn btn-primary btn-full" onclick="saveSettings()"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> บันทึก</button>
+      </div>
+      <div class="card mb-12">
+        <div class="card-title"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12.01" y2="8"/><line x1="12" y1="11" x2="12" y2="16"/></svg> ตั้งค่าระบบ</div>
+        <div class="form-group"><label>แจ้งเตือนสต๊อกต่ำกว่า</label><input type="number" id="set-low-stock" value="5"></div>
+        <div class="form-group"><label>แจ้งเตือนหมดอายุก่อน (วัน)</label><input type="number" id="set-expiry-days" value="30"></div>
+        <div class="form-group"><label>คำนวณ VAT 7%</label>
+          <select id="set-vat">
+            <option value="no">ไม่คิด VAT</option>
+            <option value="include">รวม VAT แล้ว</option>
+            <option value="exclude">บวก VAT เพิ่ม</option>
+          </select>
+        </div>
+        <button class="btn btn-primary btn-full" onclick="saveSettings()"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> บันทึก</button>
+      </div>
+      <div class="card">
+        <div class="card-title" style="color:var(--red)"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg> อันตราย</div>
+        <button class="btn btn-danger btn-full" onclick="clearAllData()"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg> ล้างข้อมูลทั้งหมด</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end page-container -->
+
+<!-- ── CART FAB ──────────────────────────────── -->
+<button id="cart-fab" onclick="openCartSheet()">
+  <svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/><path d="M2 2h2l2.6 12.59a2 2 0 0 0 2 1.61h8.6a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+  <span id="cart-count-badge">0</span>
+</button>
+
+<!-- ── BOTTOM NAV ─────────────────────────────── -->
+<nav id="bottom-nav">
+  <button class="nav-item active" onclick="showPage('pos')" id="nav-pos">
+    <span class="nav-icon"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/><path d="M2 2h2l2.6 12.59a2 2 0 0 0 2 1.61h8.6a2 2 0 0 0 2-1.61L23 6H6"/></svg></span>
+    <span>ขาย</span>
+  </button>
+  <button class="nav-item" onclick="showPage('products')" id="nav-products">
+    <span class="nav-icon"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M21 8l-9-5-9 5v8l9 5 9-5z"/><polyline points="3 8 12 13 21 8"/><line x1="12" y1="13" x2="12" y2="22"/></svg></span>
+    <span>สินค้า</span>
+    <span class="nav-badge" id="nav-alert-badge"></span>
+  </button>
+  <button class="nav-item" onclick="showPage('debt')" id="nav-debt">
+    <span class="nav-icon"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></span>
+    <span>ลูกหนี้</span>
+  </button>
+  <button class="nav-item" onclick="showPage('reports')" id="nav-reports">
+    <span class="nav-icon"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><line x1="6" y1="20" x2="6" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="18" y1="20" x2="18" y2="14"/></svg></span>
+    <span>รายงาน</span>
+  </button>
+  <button class="nav-item" onclick="showPage('more')" id="nav-more">
+    <span class="nav-icon"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></span>
+    <span>เพิ่มเติม</span>
+  </button>
+</nav>
+
+<!-- ── TOAST ─────────────────────────────────── -->
+<div id="toast-container"></div>
+
+<!-- ══════════════════════════════════════════════
+  CART SHEET
+═══════════════════════════════════════════════ -->
+<div id="cart-sheet" onclick="if(event.target===this)closeCartSheet()">
+  <div id="cart-panel">
+    <div class="cart-header">
+      <div class="modal-handle" style="margin:0"></div>
+      <span class="cart-header-title"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M4 2h16v20l-3-2-3 2-3-2-3 2-3-2-1 2z"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="13" y2="15"/></svg> รายการ</span>
+      <span class="badge badge-teal" id="cart-bill-badge">—</span>
+      <button class="btn-icon" onclick="clearCart()" title="ล้าง"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
+      <button class="btn-icon" onclick="closeCartSheet()"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="cart-items-list" id="cart-items-list"></div>
+    <div class="cart-summary">
+      <div class="sum-row"><span>รวม</span><span class="val" id="cs-subtotal">฿0.00</span></div>
+      <div class="sum-discount-row">
+        <span style="font-size:13px">ส่วนลด</span>
+        <div class="disc-inputs">
+          <input type="number" id="cs-discount-val" value="0" oninput="calcCart()" min="0">
+          <select id="cs-discount-type" onchange="calcCart()">
+            <option value="฿">฿</option>
+            <option value="%">%</option>
+          </select>
+        </div>
+      </div>
+      <div class="sum-row"><span style="font-size:12px;color:var(--text-muted)">VAT 7%</span><span class="val text-muted" id="cs-vat" style="font-size:12px">฿0.00</span></div>
+      <div class="sum-total-row"><span>ยอดรวม</span><span class="sum-total-val" id="cs-total">฿0.00</span></div>
+      <div class="cart-btn-row">
+        <button class="btn btn-secondary" onclick="addDebtSale()"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg> เชื่อ</button>
+        <button class="btn btn-secondary btn-sm" onclick="holdCurrentCart()"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M12 21s7-6.5 7-11a7 7 0 0 0-14 0c0 4.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg> พัก</button>
+        <button class="btn btn-primary" onclick="openPayment()" style="flex:2"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/></svg> ชำระเงิน</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+  MODALS
+═══════════════════════════════════════════════ -->
+
+<!-- Payment Modal -->
+<div class="modal-overlay" id="modal-payment" onclick="if(event.target===this)closeModal('modal-payment')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/></svg> ชำระเงิน</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <span style="font-size:13px;color:var(--text-muted)">ยอดรวม</span>
+      <span style="font-family:var(--mono);font-size:22px;font-weight:700;color:var(--teal)" id="pay-total-display">฿0.00</span>
+    </div>
+    <div class="pay-type-row">
+      <button class="pay-type-btn active" id="pay-cash-btn" onclick="setPayType('เงินสด')"><span class="pay-icon"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/></svg></span>เงินสด</button>
+      <button class="pay-type-btn" id="pay-transfer-btn" onclick="setPayType('โอน')"><span class="pay-icon"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.67 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.31 1.85.54 2.81.67A2 2 0 0 1 22 16.92z"/></svg></span>โอน</button>
+      <button class="pay-type-btn" id="pay-card-btn" onclick="setPayType('บัตร')"><span class="pay-icon"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></span>บัตร</button>
+    </div>
+    <!-- Cash section -->
+    <div id="pay-cash-section">
+      <div class="pay-display" id="pay-received-display">0</div>
+      <div class="pay-change-row">ทอน: <span class="pay-change-val" id="pay-change-display">฿0.00</span></div>
+      <div class="quick-cash-row">
+        <button class="quick-cash-btn" onclick="quickCash(20)">+20</button>
+        <button class="quick-cash-btn" onclick="quickCash(50)">+50</button>
+        <button class="quick-cash-btn" onclick="quickCash(100)">+100</button>
+        <button class="quick-cash-btn" onclick="quickCash(500)">+500</button>
+        <button class="quick-cash-btn" onclick="quickCash(1000)">+1000</button>
+      </div>
+      <div class="payment-keypad">
+        <button class="key-btn" onclick="keyPad('7')">7</button>
+        <button class="key-btn" onclick="keyPad('8')">8</button>
+        <button class="key-btn" onclick="keyPad('9')">9</button>
+        <button class="key-btn" onclick="keyPad('4')">4</button>
+        <button class="key-btn" onclick="keyPad('5')">5</button>
+        <button class="key-btn" onclick="keyPad('6')">6</button>
+        <button class="key-btn" onclick="keyPad('1')">1</button>
+        <button class="key-btn" onclick="keyPad('2')">2</button>
+        <button class="key-btn" onclick="keyPad('3')">3</button>
+        <button class="key-btn" onclick="keyPad('.')">.</button>
+        <button class="key-btn" onclick="keyPad('0')">0</button>
+        <button class="key-btn" onclick="keyPad('00')">00</button>
+        <button class="key-btn key-clear" onclick="keyPad('C')">C</button>
+        <button class="key-btn key-back" onclick="keyPad('BACK')"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M20 6H9l-7 6 7 6h11a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2z"/><line x1="18" y1="9" x2="12" y2="15"/><line x1="12" y1="9" x2="18" y2="15"/></svg></button>
+      </div>
+      <button class="btn btn-primary btn-full key-enter-full" onclick="confirmPayment()"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><polyline points="20 6 9 17 4 12"/></svg> ชำระ</button>
+    </div>
+    <!-- Transfer section -->
+    <div id="pay-transfer-section" style="display:none">
+      <div class="form-group"><label>ยอดโอน</label><input type="number" id="pay-transfer-amt" placeholder="0.00" inputmode="decimal"></div>
+      <div class="form-group"><label>หมายเหตุ</label><input type="text" id="pay-transfer-note" placeholder="เลขที่รายการ..."></div>
+      <button class="btn btn-primary btn-full" onclick="confirmPayment()"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><polyline points="20 6 9 17 4 12"/></svg> ยืนยันการชำระ</button>
+    </div>
+    <div style="margin-top:12px">
+      <button class="btn btn-secondary btn-full" onclick="closeModal('modal-payment')">ยกเลิก</button>
+    </div>
+  </div>
+</div>
+
+<!-- Receipt Modal -->
+<div class="modal-overlay" id="modal-receipt" onclick="if(event.target===this)newBill()">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M4 2h16v20l-3-2-3 2-3-2-3 2-3-2-1 2z"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="13" y2="15"/></svg> ใบเสร็จ</div>
+    <div id="receipt-content"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="printReceipt()"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg> พิมพ์</button>
+      <button class="btn btn-primary" onclick="newBill()"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><polyline points="20 6 9 17 4 12"/></svg> บิลใหม่</button>
+    </div>
+  </div>
+</div>
+
+<!-- Product Modal -->
+<div class="modal-overlay" id="modal-product" onclick="if(event.target===this)closeModal('modal-product')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="prod-modal-title"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> เพิ่มสินค้า</div>
+    <div class="form-group"><label>รหัสสินค้า (Master Product ID) *</label><input type="text" id="pm-product_id" placeholder="เช่น 4111505" oninput="autoFillCategory()"></div>
+    <div class="form-group">
+      <label>บาร์โค้ด (Barcode) *</label>
+      <div style="display:flex;gap:6px">
+        <input type="text" id="pm-barcode" placeholder="เช่น 8859733221136" inputmode="numeric" style="flex:1">
+        <button type="button" class="btn btn-secondary" onclick="scanBarcodeToProductForm()" title="สแกนบาร์โค้ด (กล้องสด)"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M4 8a2 2 0 0 1 2-2h1.5l1-1.5h6l1 1.5H18a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="3.5"/></svg></button>
+        <button type="button" class="btn btn-secondary" onclick="document.getElementById('pm-photo-input').click()" title="ถ่าย/เลือกรูปบาร์โค้ด"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></button>
+        <input type="file" id="pm-photo-input" accept="image/*" capture="environment" style="display:none" onchange="scanBarcodeFromPhotoToProductForm(event)">
+      </div>
+    </div>
+    <div class="form-group"><label>ชื่อสินค้า *</label><input type="text" id="pm-name"></div>
+    <div class="form-group"><label>หมวดหมู่ (Auto-fill ตามรหัส)</label>
+      <input type="text" id="pm-category" placeholder="จะถูกเติมอัตโนมัติตามรหัสสินค้า" readonly>
+      <div style="font-size:11px;color:var(--text-muted);margin-top:4px">💡 หมวดหมู่จะถูกเติมอัตโนมัติเมื่อกรอกรหัสสินค้า ตามที่ตั้งค่าในหน้า "เพิ่มเติม"</div>
+    </div>
+    <div class="form-group"><label>ราคาขาย (บาท) *</label><input type="number" id="pm-price" inputmode="decimal" step="0.01" placeholder="0.00"></div>
+    <div class="form-group"><label>ราคาทุน (บาท)</label><input type="number" id="pm-cost" inputmode="decimal" step="0.01"></div>
+    <div class="form-group"><label>สต๊อก</label><input type="number" id="pm-stock" inputmode="numeric"></div>
+    <div class="form-group"><label>แจ้งเตือนสต๊อกต่ำกว่า</label><input type="number" id="pm-min-stock" inputmode="numeric"></div>
+    <div class="form-group"><label>วันหมดอายุ</label><input type="date" id="pm-expiry"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-product')">ยกเลิก</button>
+      <button class="btn btn-primary" onclick="saveProduct()"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<!-- Purchase Modal -->
+<div class="modal-overlay" id="modal-purchase" onclick="if(event.target===this)closeModal('modal-purchase')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><rect x="1" y="7" width="14" height="10" rx="1"/><path d="M15 10h4l3 3v4h-7z"/><circle cx="6" cy="19" r="1.5"/><circle cx="17" cy="19" r="1.5"/></svg> บันทึกสั่งซื้อ</div>
+    <div class="form-group"><label>วันที่</label><input type="date" id="pur-date"></div>
+    <div class="form-group"><label>ผู้จำหน่าย</label><input type="text" id="pur-supplier"></div>
+    <div id="pur-items-list"></div>
+    <button class="btn btn-secondary btn-full" onclick="addPurItem()" style="margin-bottom:8px"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> เพิ่มรายการสินค้า</button>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-purchase')">ยกเลิก</button>
+      <button class="btn btn-primary" onclick="savePurchase()"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<!-- Debt Modal -->
+<div class="modal-overlay" id="modal-debt" onclick="if(event.target===this)closeModal('modal-debt')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="debt-modal-title"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> เพิ่มลูกหนี้</div>
+    <div class="form-group"><label>ชื่อลูกค้า *</label><input type="text" id="dm-name"></div>
+    <div class="form-group"><label>เบอร์โทร</label><input type="text" id="dm-phone" inputmode="tel"></div>
+    <div class="form-group"><label>ยอดเงิน</label><input type="number" id="dm-amount" inputmode="decimal" step="0.01"></div>
+    <div class="form-group"><label>วันที่</label><input type="date" id="dm-date"></div>
+    <div class="form-group"><label>หมายเหตุ</label><input type="text" id="dm-note"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-debt')">ยกเลิก</button>
+      <button class="btn btn-primary" onclick="saveDebt()"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<!-- Pay Debt Modal -->
+<div class="modal-overlay" id="modal-pay-debt" onclick="if(event.target===this)closeModal('modal-pay-debt')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg> รับชำระหนี้</div>
+    <div class="form-group"><label>ชื่อลูกค้า</label><input type="text" id="pd-name" readonly></div>
+    <div class="form-group"><label>ยอดค้าง</label><input type="number" id="pd-outstanding" readonly></div>
+    <div class="form-group"><label>ยอดที่รับ</label><input type="number" id="pd-pay-amt" inputmode="decimal" step="0.01"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-pay-debt')">ยกเลิก</button>
+      <button class="btn btn-primary" onclick="confirmPayDebt()"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><polyline points="20 6 9 17 4 12"/></svg> รับชำระ</button>
+    </div>
+  </div>
+</div>
+
+<!-- Expense Modal -->
+<div class="modal-overlay" id="modal-expense" onclick="if(event.target===this)closeModal('modal-expense')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M9 4h6l2 4H7z"/><path d="M6 8h12l1.5 10a3 3 0 0 1-3 3.5h-9A3 3 0 0 1 4.5 18z"/></svg> บันทึกรายจ่าย</div>
+    <div class="form-group"><label>รายการ</label><input type="text" id="exp-name" placeholder="ค่าน้ำ ค่าไฟ..."></div>
+    <div class="form-group"><label>จำนวนเงิน</label><input type="number" id="exp-amount" inputmode="decimal" step="0.01"></div>
+    <div class="form-group"><label>วันที่</label><input type="date" id="exp-date"></div>
+    <div class="form-group"><label>หมายเหตุ</label><input type="text" id="exp-note"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-expense')">ยกเลิก</button>
+      <button class="btn btn-primary" onclick="saveExpense()"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<!-- Stock Adjust Modal -->
+<div class="modal-overlay" id="modal-stock-adjust" onclick="if(event.target===this)closeModal('modal-stock-adjust')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M12 3v18"/><path d="M5 7h14"/><path d="M5 7l-3 7a3.5 3.5 0 0 0 7 0z"/><path d="M19 7l-3 7a3.5 3.5 0 0 0 7 0z"/></svg> ปรับสต๊อก</div>
+    <div class="form-group"><input type="text" id="adj-search" placeholder="ค้นหา..." oninput="renderAdjList()"></div>
+    <div id="adj-list" style="max-height:50vh;overflow-y:auto"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-stock-adjust')">ยกเลิก</button>
+      <button class="btn btn-primary" onclick="saveStockAdjust()"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<!-- Hold Bills Modal -->
+<div class="modal-overlay" id="modal-hold" onclick="if(event.target===this)closeModal('modal-hold')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title"><svg viewBox="0 0 24 24" style="display:inline-block;width:1em;height:1em;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M12 21s7-6.5 7-11a7 7 0 0 0-14 0c0 4.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg> บิลพัก</div>
+    <div id="hold-bills-list"></div>
+    <div style="margin-top:12px"><button class="btn btn-secondary btn-full" onclick="closeModal('modal-hold')">ปิด</button></div>
+  </div>
+</div>
+
+<script src="script-pos.js"></script>
+</body>
+</html>

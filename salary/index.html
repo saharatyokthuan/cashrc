@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes"/>
+<title>บันทึกเงินเดือน</title>
+<link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<div class="app-header">
+  <div class="header-left">
+    <span class="logo">♻️</span>
+    <div class="header-titles">
+      <span class="app-title">บันทึกเงินเดือน</span>
+      <span class="app-subtitle" id="profileSubtitle"></span>
+    </div>
+  </div>
+  <div class="header-right">
+    <button class="btn-chip" onclick="exportCSV()">📤CSV</button>
+    <button class="btn-chip" onclick="exportBackup()">🔄Backup</button>
+    <button class="btn-chip" onclick="document.getElementById('restoreInput').click()">📥Input</button>
+    <input type="file" id="restoreInput" accept=".json" style="display:none" onchange="importBackup(event)">
+  </div>
+</div>
+
+<div class="tab-bar">
+  <button type="button" class="tab-btn active" data-tab="record" onclick="showTab('record')">📝 บันทึก</button>
+  <button type="button" class="tab-btn" data-tab="history" onclick="showTab('history')">📜 ประวัติ</button>
+  <button type="button" class="tab-btn" data-tab="trend" onclick="showTab('trend')">📈 แนวโน้ม</button>
+  <button type="button" class="tab-btn" data-tab="category" onclick="showTab('category')">🏷️ หมวดหมู่</button>
+  <button type="button" class="tab-btn" data-tab="settings" onclick="showTab('settings')">⚙️ ตั้งค่า</button>
+</div>
+
+<!-- ===== RECORD TAB ===== -->
+<div class="tab-page active" id="tab-record">
+  <div id="editingBanner" class="editing-banner" style="display:none;">
+    ✏️ กำลังแก้ไขสลิปที่เลือก
+    <button type="button" class="btn-cancel-edit" onclick="cancelEdit()">ยกเลิกแก้ไข</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">ข้อมูลงวด</div>
+    <div class="form-row">
+      <div class="form-group"><label for="periodInput">งวดที่</label><input type="text" id="periodInput" placeholder="เช่น 03"></div>
+      <div class="form-group"><label for="dateInput">วันที่จ่าย</label><input type="date" id="dateInput" onchange="recalcSums()"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title title-income">รายการรับ / Income</div>
+    <div id="incomeRows"></div>
+    <button type="button" class="btn-add add-income" onclick="addRow('income')">＋ เพิ่มรายการรับ</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title title-deduction">รายการหัก / Deduction</div>
+    <div id="deductionRows"></div>
+    <button type="button" class="btn-add add-deduction" onclick="addRow('deduction')">＋ เพิ่มรายการหัก</button>
+  </div>
+
+  <div class="card summary-card">
+    <div class="sum-row"><span>รวมรับ</span><span id="sumIncome">0.00</span></div>
+    <div class="sum-row"><span>รวมหัก</span><span id="sumDeduction">0.00</span></div>
+    <div class="sum-row net"><span>เงินได้สุทธิ</span><span id="sumNet">0.00</span></div>
+  </div>
+
+  <div class="card summary-card">
+    <div class="card-title">ยอดสะสม (คำนวณอัตโนมัติ ภายในปีเดียวกัน)</div>
+    <div class="sum-row"><span>เงินได้สะสม</span><span id="accuIncomeDisplay">0.00</span></div>
+    <div class="sum-row"><span>ภาษีสะสม</span><span id="accuTaxDisplay">0.00</span></div>
+    <div class="sum-row"><span>ประกันสังคมสะสม</span><span id="accuSSDisplay">0.00</span></div>
+  </div>
+
+  <button type="button" class="btn-save-slip" onclick="saveSlip()">💾บันทึก</button>
+</div>
+
+<!-- ===== HISTORY TAB ===== -->
+<div class="tab-page" id="tab-history">
+  <div class="list-header">ประวัติสลิปทั้งหมด (<span id="historyCount">0</span>)</div>
+  <div id="historyList" class="history-list"></div>
+</div>
+
+<!-- ===== TREND TAB ===== -->
+<div class="tab-page" id="tab-trend">
+  <div class="card">
+    <div class="card-title">สรุปภาพรวม</div>
+    <div class="grid-3">
+      <div class="stat-box"><div class="stat-label">เฉลี่ยสุทธิ</div><div class="stat-val" id="avgNet">0</div></div>
+      <div class="stat-box"><div class="stat-label">สูงสุด</div><div class="stat-val good" id="maxNet">0</div></div>
+      <div class="stat-box"><div class="stat-label">ต่ำสุด</div><div class="stat-val bad" id="minNet">0</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">แนวโน้มเงินได้สุทธิ</div>
+    <canvas id="trendChart"></canvas>
+    <div id="trendEmpty" class="empty-hint" style="display:none;">ยังไม่มีข้อมูลพอสำหรับกราฟ</div>
+  </div>
+  <div class="card">
+    <div class="card-title">รับ vs หัก รายงวด</div>
+    <canvas id="barChart"></canvas>
+    <div id="barEmpty" class="empty-hint" style="display:none;">ยังไม่มีข้อมูลพอสำหรับกราฟ</div>
+  </div>
+</div>
+
+<!-- ===== CATEGORY TAB ===== -->
+<div class="tab-page" id="tab-category">
+  <div class="cat-type-toggle">
+    <button type="button" class="cat-type-btn active" data-cattype="income" onclick="setCatType('income')">รายการรับ</button>
+    <button type="button" class="cat-type-btn" data-cattype="deduction" onclick="setCatType('deduction')">รายการหัก</button>
+  </div>
+  <div class="card">
+    <div class="form-row-single">
+      <input type="text" id="newCatName" placeholder="เพิ่มชื่อรายการใหม่">
+      <button type="button" class="btn-add-cat" onclick="addCategoryFromInput()">＋</button>
+    </div>
+  </div>
+  <div id="categoryList" class="category-list"></div>
+</div>
+
+<!-- ===== SETTINGS TAB ===== -->
+<div class="tab-page" id="tab-settings">
+  <div class="card">
+    <div class="card-title">ข้อมูลส่วนตัว (ข้อมูลที่ไม่ค่อยเปลี่ยน)</div>
+    <div class="form-group"><label for="profName">ชื่อ-สกุล</label><input type="text" id="profName" placeholder="เช่น นายสมชาย ใจดี"></div>
+    <div class="form-group"><label for="profEmpCode">รหัสพนักงาน</label><input type="text" id="profEmpCode" placeholder="เช่น 1234567"></div>
+    <div class="form-group"><label for="profBranch">สาขา / หน่วยงาน</label><input type="text" id="profBranch" placeholder="เช่น สาขา 12345"></div>
+    <div class="form-group"><label for="profBankAccount">เลขบัญชีธนาคาร</label><input type="text" id="profBankAccount" placeholder="เช่น 1234567890"></div>
+  </div>
+  <button type="button" class="btn-save-slip" onclick="saveProfile()">💾 บันทึกข้อมูลส่วนตัว</button>
+  <div class="empty-hint" style="margin-top:0.6rem;">ข้อมูลนี้เก็บในเครื่องนี้เท่านั้น ไม่ถูกส่งออกไปที่ไหน</div>
+</div>
+
+<!-- ===== DETAIL MODAL ===== -->
+<div class="modal-bg" id="detailModalBg">
+  <div class="modal">
+    <h2 id="detailTitle">รายละเอียดสลิป</h2>
+    <div id="detailBody" class="detail-body"></div>
+    <div class="modal-btns">
+      <button type="button" class="btn-cancel" onclick="closeDetail()">ปิด</button>
+      <button type="button" class="btn-del" onclick="deleteSlipFromDetail()">🗑️ ลบ</button>
+      <button type="button" class="btn-save" onclick="editSlipFromDetail()">✏️ แก้ไข</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== CONFIRM MODAL ===== -->
+<div class="modal-bg" id="confirmModalBg">
+  <div class="modal" style="max-width:340px;">
+    <h2 id="confirmTitle" style="color:var(--red);">ยืนยันการดำเนินการ</h2>
+    <p id="confirmMessage" class="confirm-msg"></p>
+    <div class="modal-btns">
+      <button type="button" class="btn-cancel" id="confirmNoBtn">ยกเลิก</button>
+      <button type="button" class="btn-save" id="confirmYesBtn" style="border-color:var(--red) !important;color:var(--red);">ยืนยัน</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="script.js" defer></script>
+</body>
+</html>

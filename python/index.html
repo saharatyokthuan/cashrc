@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="th" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🐍 Python พื้นฐาน — เรียนออนไลน์</title>
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/prism-theme.css">
+  
+  <!-- Prism CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/line-numbers/prism-line-numbers.min.css">
+</head>
+<body>
+  <!-- ===== Topbar ===== -->
+  <header class="topbar">
+    <button id="menuBtn" class="icon-btn" aria-label="เมนู">☰</button>
+    <span class="brand">🐍 Python พื้นฐาน</span>
+    <div class="topbar-right">
+      <input id="search" type="text" placeholder="🔍 ค้นหาบทเรียน..." aria-label="ค้นหา">
+      <span id="progressLabel" class="progress-text">0 / 24</span>
+      <button id="themeBtn" class="icon-btn" aria-label="สลับธีม">🌙</button>
+    </div>
+  </header>
+
+  <!-- ===== Layout ===== -->
+  <div class="layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <nav id="toc" aria-label="สารบัญ"></nav>
+      <button class="reset-btn" id="resetBtn">🔄 รีเซ็ตความคืบหน้า</button>
+    </aside>
+
+    <!-- Main Content -->
+    <main id="content" role="main"></main>
+  </div>
+
+  <!-- ===== Footer ===== -->
+  <footer class="footer">
+    <p>🐍 Python สำหรับผู้เริ่มต้น — เรียนฟรี ไม่มีค่าใช้จ่าย</p>
+    <p style="font-size:0.75rem;opacity:0.6;">MIT License — นำไปใช้และดัดแปลงได้อิสระ</p>
+  </footer>
+
+  <!-- ===== Prism JS ===== -->
+  <script>window.Prism = { manual: true };</script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+  
+  <!-- ===== App JS ===== -->
+  <script src="js/data.js"></script>
+  <script src="js/script.js"></script>
+</body>
+</html>

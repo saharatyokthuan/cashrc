@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="คู่มือการเขียน HTML ฉบับสมบูรณ์ - โครงสร้างพื้นฐาน">
+    <meta name="author" content="ผู้เรียน HTML">
+    <title>🌐 โครงสร้างพื้นฐาน | คู่มือ HTML</title>
+
+    <link rel="icon" href="../favicon.ico" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+    <header>
+        <h1>🌐 <span class="highlight">คู่มือการเขียน</span> HTML</h1>
+        <p class="subtitle">บทที่ 2 — โครงสร้างพื้นฐาน</p>
+        <nav>
+            <a href="../index.html"><i class="fas fa-list"></i> สารบัญ</a>
+            <a href="01-intro.html"><i class="fas fa-arrow-left"></i> บทนำ HTML</a>
+            <a href="03-elements.html">HTML Elements และ Tags <i class="fas fa-arrow-right"></i></a>
+        </nav>
+    </header>
+
+    <main>
+<div id="structure" class="section">
+            <h2><i class="fas fa-sitemap"></i> โครงสร้างพื้นฐาน</h2>
+
+            <h3>Minimal HTML Document</h3>
+            <p>โครงสร้าง HTML ที่สมบูรณ์ต่ำสุด:</p>
+            <div class="code-block">
+                <span class="tag">&lt;!DOCTYPE html&gt;</span><br>
+                <span class="tag">&lt;html</span> <span class="attr">lang</span>=<span class="string">"th"</span><span class="tag">&gt;</span><br>
+                &nbsp;&nbsp;<span class="tag">&lt;head&gt;</span><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="tag">&lt;meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span> <span class="tag">/&gt;</span><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="tag">&lt;title&gt;</span>ชื่อเพจ<span class="tag">&lt;/title&gt;</span><br>
+                &nbsp;&nbsp;<span class="tag">&lt;/head&gt;</span><br>
+                &nbsp;&nbsp;<span class="tag">&lt;body&gt;</span><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="tag">&lt;h1&gt;</span>ยินดีต้อนรับ<span class="tag">&lt;/h1&gt;</span><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="tag">&lt;p&gt;</span>เนื้อหาของเพจ<span class="tag">&lt;/p&gt;</span><br>
+                &nbsp;&nbsp;<span class="tag">&lt;/body&gt;</span><br>
+                <span class="tag">&lt;/html&gt;</span>
+            </div>
+
+            <div class="alert alert-info">
+                <i class="fas fa-lightbulb"></i>
+                <strong>ข้อมูล:</strong> DOCTYPE บอกให้เบราว์เซอร์รู้ว่าใช้ HTML5 และต้องอยู่ที่บรรทัดแรกเสมอ
+            </div>
+
+            <h4>DOCTYPE Declaration</h4>
+            <div class="code-block">
+                <span class="tag">&lt;!DOCTYPE html&gt;</span>
+            </div>
+            <ul>
+                <li>บอกให้เบราว์เซอร์รู้ว่านี่คือ HTML5</li>
+                <li>ต้องอยู่ที่บรรทัดแรกเสมอ</li>
+                <li>หากไม่มี doctype อาจเกิด rendering issues</li>
+            </ul>
+
+            <h4>HTML Element</h4>
+            <div class="code-block">
+                <span class="tag">&lt;html</span> <span class="attr">lang</span>=<span class="string">"th"</span> <span class="attr">dir</span>=<span class="string">"ltr"</span><span class="tag">&gt;</span><br>
+                &nbsp;&nbsp;<span class="comment">&lt;!-- เนื้อหา --&gt;</span><br>
+                <span class="tag">&lt;/html&gt;</span>
+            </div>
+            <ul>
+                <li>Root element ของเอกสาร</li>
+                <li><code>lang="th"</code> - บอกว่าเพจใช้ภาษาไทย</li>
+                <li><code>dir="ltr"</code> - ทิศทางการอ่าน (ltr = left to right)</li>
+            </ul>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-links">
+            <a href="#">นโยบายความเป็นส่วนตัว</a>
+            <a href="#">ข้อกำหนดการใช้งาน</a>
+            <a href="#">ติดต่อเรา</a>
+        </div>
+        <p class="credit">
+            <i class="fas fa-heart" style="color:#e74c3c;"></i> 
+            สร้างด้วย HTML5, CSS3 &amp; JavaScript
+        </p>
+    </footer>
+
+    <button class="scroll-top" id="scrollTopBtn" title="กลับด้านบน">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+
+    <script src="../script.js"></script>
+</body>
+</html>

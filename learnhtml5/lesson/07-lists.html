@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="คู่มือการเขียน HTML ฉบับสมบูรณ์ - List Elements">
+    <meta name="author" content="ผู้เรียน HTML">
+    <title>🌐 List Elements | คู่มือ HTML</title>
+
+    <link rel="icon" href="../favicon.ico" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+    <header>
+        <h1>🌐 <span class="highlight">คู่มือการเขียน</span> HTML</h1>
+        <p class="subtitle">บทที่ 7 — List Elements</p>
+        <nav>
+            <a href="../index.html"><i class="fas fa-list"></i> สารบัญ</a>
+            <a href="06-images.html"><i class="fas fa-arrow-left"></i> Image Elements</a>
+            <a href="08-tables.html">Table Elements <i class="fas fa-arrow-right"></i></a>
+        </nav>
+    </header>
+
+    <main>
+<div id="lists" class="section">
+            <h2><i class="fas fa-list"></i> List Elements</h2>
+            <p class="description">Lists ใช้สำหรับแสดงข้อมูลในรูปแบบรายการ มี 3 ประเภท: Unordered, Ordered, และ Description</p>
+
+            <h3>Unordered List (รายการไม่มีลำดับ)</h3>
+            <div class="code-block">
+                <span class="tag">&lt;ul&gt;</span><br>
+                &nbsp;&nbsp;<span class="tag">&lt;li&gt;</span>รายการที่ 1<span class="tag">&lt;/li&gt;</span><br>
+                &nbsp;&nbsp;<span class="tag">&lt;li&gt;</span>รายการที่ 2<span class="tag">&lt;/li&gt;</span><br>
+                &nbsp;&nbsp;<span class="tag">&lt;li&gt;</span>รายการที่ 3<span class="tag">&lt;/li&gt;</span><br>
+                <span class="tag">&lt;/ul&gt;</span>
+            </div>
+
+            <h3>Ordered List (รายการมีลำดับ)</h3>
+            <div class="code-block">
+                <span class="tag">&lt;ol&gt;</span><br>
+                &nbsp;&nbsp;<span class="tag">&lt;li&gt;</span>ขั้นตอนแรก<span class="tag">&lt;/li&gt;</span><br>
+                &nbsp;&nbsp;<span class="tag">&lt;li&gt;</span>ขั้นตอนที่สอง<span class="tag">&lt;/li&gt;</span><br>
+                &nbsp;&nbsp;<span class="tag">&lt;li&gt;</span>ขั้นตอนที่สาม<span class="tag">&lt;/li&gt;</span><br>
+                <span class="tag">&lt;/ol&gt;</span>
+            </div>
+
+            <h3>Nested List (รายการซ้อน)</h3>
+            <div class="code-block">
+                <span class="tag">&lt;ul&gt;</span><br>
+                &nbsp;&nbsp;<span class="tag">&lt;li&gt;</span>หมวดหมู่ 1<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="tag">&lt;ul&gt;</span><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tag">&lt;li&gt;</span>หมวดย่อย 1.1<span class="tag">&lt;/li&gt;</span><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tag">&lt;li&gt;</span>หมวดย่อย 1.2<span class="tag">&lt;/li&gt;</span><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="tag">&lt;/ul&gt;</span><br>
+                &nbsp;&nbsp;<span class="tag">&lt;/li&gt;</span><br>
+                &nbsp;&nbsp;<span class="tag">&lt;li&gt;</span>หมวดหมู่ 2<span class="tag">&lt;/li&gt;</span><br>
+                <span class="tag">&lt;/ul&gt;</span>
+            </div>
+
+            <h3>Description List (รายการอธิบาย)</h3>
+            <div class="code-block">
+                <span class="tag">&lt;dl&gt;</span><br>
+                &nbsp;&nbsp;<span class="tag">&lt;dt&gt;</span>HTML<span class="tag">&lt;/dt&gt;</span><br>
+                &nbsp;&nbsp;<span class="tag">&lt;dd&gt;</span>ภาษามาร์กอัป - โครงสร้างของเว็บ<span class="tag">&lt;/dd&gt;</span><br>
+                &nbsp;&nbsp;<span class="tag">&lt;dt&gt;</span>CSS<span class="tag">&lt;/dt&gt;</span><br>
+                &nbsp;&nbsp;<span class="tag">&lt;dd&gt;</span>แบบฟอร์มและการออกแบบ - ลักษณะของเว็บ<span class="tag">&lt;/dd&gt;</span><br>
+                <span class="tag">&lt;/dl&gt;</span>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-links">
+            <a href="#">นโยบายความเป็นส่วนตัว</a>
+            <a href="#">ข้อกำหนดการใช้งาน</a>
+            <a href="#">ติดต่อเรา</a>
+        </div>
+        <p class="credit">
+            <i class="fas fa-heart" style="color:#e74c3c;"></i> 
+            สร้างด้วย HTML5, CSS3 &amp; JavaScript
+        </p>
+    </footer>
+
+    <button class="scroll-top" id="scrollTopBtn" title="กลับด้านบน">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+
+    <script src="../script.js"></script>
+</body>
+</html>

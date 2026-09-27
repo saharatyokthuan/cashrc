@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="คู่มือการเขียน HTML ฉบับสมบูรณ์ - Form Elements">
+    <meta name="author" content="ผู้เรียน HTML">
+    <title>🌐 Form Elements | คู่มือ HTML</title>
+
+    <link rel="icon" href="../favicon.ico" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+    <header>
+        <h1>🌐 <span class="highlight">คู่มือการเขียน</span> HTML</h1>
+        <p class="subtitle">บทที่ 9 — Form Elements</p>
+        <nav>
+            <a href="../index.html"><i class="fas fa-list"></i> สารบัญ</a>
+            <a href="08-tables.html"><i class="fas fa-arrow-left"></i> Table Elements</a>
+            <a href="10-semantic.html">Semantic Elements <i class="fas fa-arrow-right"></i></a>
+        </nav>
+    </header>
+
+    <main>
+<div id="forms" class="section">
+            <h2><i class="fas fa-form"></i> Form Elements</h2>
+            <p class="description">Forms ใช้สำหรับรวบรวมข้อมูลจากผู้ใช้เช่น ชื่อ อีเมล ข้อความ ฯลฯ</p>
+
+            <h3>Basic Form (ฟอร์มพื้นฐาน)</h3>
+            <div class="code-block">
+                <span class="tag">&lt;form</span> <span class="attr">action</span>=<span class="string">"submit.php"</span> <span class="attr">method</span>=<span class="string">"POST"</span><span class="tag">&gt;</span><br>
+                &nbsp;&nbsp;<span class="tag">&lt;label</span> <span class="attr">for</span>=<span class="string">"username"</span><span class="tag">&gt;</span>ชื่อผู้ใช้:<span class="tag">&lt;/label&gt;</span><br>
+                &nbsp;&nbsp;<span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">id</span>=<span class="string">"username"</span> <span class="attr">name</span>=<span class="string">"username"</span> <span class="attr">required</span> <span class="tag">/&gt;</span><br><br>
+                &nbsp;&nbsp;<span class="tag">&lt;label</span> <span class="attr">for</span>=<span class="string">"email"</span><span class="tag">&gt;</span>อีเมล:<span class="tag">&lt;/label&gt;</span><br>
+                &nbsp;&nbsp;<span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="string">"email"</span> <span class="attr">id</span>=<span class="string">"email"</span> <span class="attr">name</span>=<span class="string">"email"</span> <span class="attr">required</span> <span class="tag">/&gt;</span><br><br>
+                &nbsp;&nbsp;<span class="tag">&lt;label</span> <span class="attr">for</span>=<span class="string">"message"</span><span class="tag">&gt;</span>ข้อความ:<span class="tag">&lt;/label&gt;</span><br>
+                &nbsp;&nbsp;<span class="tag">&lt;textarea</span> <span class="attr">id</span>=<span class="string">"message"</span> <span class="attr">name</span>=<span class="string">"message"</span><span class="tag">&gt;&lt;/textarea&gt;</span><br><br>
+                &nbsp;&nbsp;<span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="string">"submit"</span> <span class="attr">value</span>=<span class="string">"ส่งข้อมูล"</span> <span class="tag">/&gt;</span><br>
+                <span class="tag">&lt;/form&gt;</span>
+            </div>
+
+            <h4>Form Attributes (คุณลักษณะของฟอร์ม)</h4>
+            <ul>
+                <li><code>action</code> - URL ที่ฟอร์มจะส่งข้อมูลไป</li>
+                <li><code>method</code> - วิธีการส่ง (GET หรือ POST)</li>
+                <li><code>name</code> - ชื่อของ input (ส่วนข้อมูล)</li>
+                <li><code>id</code> - unique identifier สำหรับ JavaScript และ label</li>
+                <li><code>required</code> - ทำให้ input บังคับต้องกรอก</li>
+            </ul>
+
+            <h4>Input Types (ประเภทของ input)</h4>
+            <div class="code-block">
+                <span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="tag">/&gt;</span>           <span class="comment">&lt;!-- ข้อความปกติ --&gt;</span><br>
+                <span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="string">"email"</span> <span class="tag">/&gt;</span>          <span class="comment">&lt;!-- อีเมล (มี validation) --&gt;</span><br>
+                <span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="string">"password"</span> <span class="tag">/&gt;</span>       <span class="comment">&lt;!-- รหัสผ่าน (ซ่อนข้อความ) --&gt;</span><br>
+                <span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="string">"number"</span> <span class="tag">/&gt;</span>          <span class="comment">&lt;!-- ตัวเลข --&gt;</span><br>
+                <span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="string">"date"</span> <span class="tag">/&gt;</span>            <span class="comment">&lt;!-- วันที่ --&gt;</span><br>
+                <span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="string">"checkbox"</span> <span class="tag">/&gt;</span>       <span class="comment">&lt;!-- กล่องเลือก --&gt;</span><br>
+                <span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="string">"radio"</span> <span class="tag">/&gt;</span>          <span class="comment">&lt;!-- ปุ่มเลือก (หนึ่งเดียว) --&gt;</span><br>
+                <span class="tag">&lt;textarea&gt;&lt;/textarea&gt;</span>          <span class="comment">&lt;!-- พื้นที่ข้อความหลายบรรทัด --&gt;</span><br>
+                <span class="tag">&lt;select&gt;&lt;/select&gt;</span>              <span class="comment">&lt;!-- ดรอปดาวน์ --&gt;</span>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-links">
+            <a href="#">นโยบายความเป็นส่วนตัว</a>
+            <a href="#">ข้อกำหนดการใช้งาน</a>
+            <a href="#">ติดต่อเรา</a>
+        </div>
+        <p class="credit">
+            <i class="fas fa-heart" style="color:#e74c3c;"></i> 
+            สร้างด้วย HTML5, CSS3 &amp; JavaScript
+        </p>
+    </footer>
+
+    <button class="scroll-top" id="scrollTopBtn" title="กลับด้านบน">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+
+    <script src="../script.js"></script>
+</body>
+</html>

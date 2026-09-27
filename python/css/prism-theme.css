@@ -1,0 +1,187 @@
+/* ============================================================
+   prism-theme.css — สีสันสำหรับไฮไลต์โค้ด
+   ============================================================ */
+
+/* ===== Token Colors ===== */
+:root {
+  --tk-comment: #6a7280;
+  --tk-keyword: #c026d3;
+  --tk-string: #15803d;
+  --tk-number: #c2410c;
+  --tk-func: #2563eb;
+  --tk-builtin: #0891b2;
+  --tk-op: #475569;
+  --tk-punct: #64748b;
+  --tk-decorator: #b45309;
+  --tk-line-no: #94a3b8;
+}
+
+[data-theme="dark"] {
+  --tk-comment: #6b7688;
+  --tk-keyword: #ff7edb;
+  --tk-string: #a5e075;
+  --tk-number: #ffb86c;
+  --tk-func: #79b8ff;
+  --tk-builtin: #5fd7e6;
+  --tk-op: #c3cad6;
+  --tk-punct: #8b95a5;
+  --tk-decorator: #ffca7a;
+  --tk-line-no: #4b5563;
+}
+
+/* ===== Base ===== */
+.code pre[class*="language-"],
+.code code[class*="language-"] {
+  background: var(--code-bg);
+  color: var(--code-text);
+  font-family: "Fira Code", "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  font-size: 0.84rem;
+  line-height: 1.7;
+  text-shadow: none;
+  tab-size: 4;
+  -webkit-font-smoothing: antialiased;
+}
+
+.code pre[class*="language-"] {
+  margin: 0;
+  padding: 16px 18px;
+  border-radius: 10px;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+}
+
+/* Selection */
+.code pre[class*="language-"] ::selection,
+.code code[class*="language-"] ::selection {
+  background: rgba(110, 160, 255, 0.32);
+  text-shadow: none;
+}
+
+/* ===== Tokens ===== */
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: var(--tk-comment);
+  font-style: italic;
+}
+
+.token.punctuation {
+  color: var(--tk-punct);
+}
+
+.token.keyword,
+.token.control-flow,
+.token.operator-keyword {
+  color: var(--tk-keyword);
+  font-weight: 600;
+}
+
+.token.boolean,
+.token.number {
+  color: var(--tk-number);
+}
+
+.token.string,
+.token.triple-quoted-string,
+.token.char,
+.token.attr-value {
+  color: var(--tk-string);
+}
+
+.token.function,
+.token.method,
+.token.function-variable {
+  color: var(--tk-func);
+  font-weight: 500;
+}
+
+.token.builtin,
+.token.class-name,
+.token.builtin-function {
+  color: var(--tk-builtin);
+}
+
+.token.operator {
+  color: var(--tk-op);
+  background: transparent;
+}
+
+.token.decorator,
+.token.annotation {
+  color: var(--tk-decorator);
+  font-weight: 600;
+}
+
+.token.interpolation {
+  color: var(--tk-func);
+}
+
+.token.important,
+.token.bold {
+  font-weight: 700;
+}
+.token.italic {
+  font-style: italic;
+}
+
+.token.variable {
+  color: var(--code-text);
+}
+
+/* ===== Line Numbers ===== */
+pre[class*="language-"].line-numbers {
+  padding-left: 3.5em;
+  position: relative;
+  counter-reset: linenumber;
+}
+
+.line-numbers .line-numbers-rows {
+  border-right: 1px solid var(--border);
+  left: -3.5em;
+  width: 3em;
+  padding-right: 0.6em;
+}
+
+.line-numbers-rows > span::before {
+  color: var(--tk-line-no);
+  font-size: 0.78rem;
+}
+
+/* ===== Output Block ===== */
+.code.is-output pre[class*="language-"] {
+  background: var(--surface-2);
+  color: var(--text);
+  border-left: 3px solid var(--ok);
+}
+.code.is-output .lang-tag {
+  color: var(--ok);
+  background: var(--ok-bg);
+}
+
+/* ===== Print ===== */
+@media print {
+  .code pre[class*="language-"] {
+    background: #fff !important;
+    color: #111 !important;
+    border: 1px solid #ccc;
+    white-space: pre-wrap;
+  }
+  .token.comment {
+    color: #666 !important;
+    font-style: italic;
+  }
+  .token.keyword {
+    color: #000 !important;
+    font-weight: 700;
+  }
+  .token.string {
+    color: #333 !important;
+  }
+  .token.number {
+    color: #c2410c !important;
+  }
+  .token.function {
+    color: #2563eb !important;
+  }
+}

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="คู่มือการเขียน HTML ฉบับสมบูรณ์ - Common Mistakes">
+    <meta name="author" content="ผู้เรียน HTML">
+    <title>🌐 Common Mistakes | คู่มือ HTML</title>
+
+    <link rel="icon" href="../favicon.ico" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+    <header>
+        <h1>🌐 <span class="highlight">คู่มือการเขียน</span> HTML</h1>
+        <p class="subtitle">บทที่ 15 — Common Mistakes</p>
+        <nav>
+            <a href="../index.html"><i class="fas fa-list"></i> สารบัญ</a>
+            <a href="14-best-practices.html"><i class="fas fa-arrow-left"></i> Best Practices</a>
+            <a href="16-tools.html">Tools & Resources <i class="fas fa-arrow-right"></i></a>
+        </nav>
+    </header>
+
+    <main>
+<div id="common-mistakes" class="section">
+            <h2><i class="fas fa-exclamation-triangle"></i> Common Mistakes (ข้อผิดพลาดที่พบบ่อย)</h2>
+
+            <h3>1. Missing Alt Text</h3>
+            <div class="example-grid">
+                <div class="example-box bad">
+                    <span class="label bad-label">❌ ผิด:</span>
+                    <div class="code-block" style="margin:5px 0; font-size:0.85em;">
+                        <span class="tag">&lt;img</span> <span class="attr">src</span>=<span class="string">"photo.jpg"</span> <span class="tag">/&gt;</span>
+                    </div>
+                </div>
+                <div class="example-box good">
+                    <span class="label good-label">✅ ถูก:</span>
+                    <div class="code-block" style="margin:5px 0; font-size:0.85em;">
+                        <span class="tag">&lt;img</span> <span class="attr">src</span>=<span class="string">"photo.jpg"</span> <span class="attr">alt</span>=<span class="string">"คำอธิบายรูป"</span> <span class="tag">/&gt;</span>
+                    </div>
+                </div>
+            </div>
+
+            <h3>2. Improper Nesting</h3>
+            <div class="example-grid">
+                <div class="example-box bad">
+                    <span class="label bad-label">❌ ผิด:</span>
+                    <div class="code-block" style="margin:5px 0; font-size:0.85em;">
+                        <span class="tag">&lt;b&gt;&lt;i&gt;</span>ข้อความ<span class="tag">&lt;/b&gt;&lt;/i&gt;</span>
+                    </div>
+                </div>
+                <div class="example-box good">
+                    <span class="label good-label">✅ ถูก:</span>
+                    <div class="code-block" style="margin:5px 0; font-size:0.85em;">
+                        <span class="tag">&lt;b&gt;&lt;i&gt;</span>ข้อความ<span class="tag">&lt;/i&gt;&lt;/b&gt;</span>
+                    </div>
+                </div>
+            </div>
+
+            <h3>3. Using Too Many h1 Tags</h3>
+            <div class="example-grid">
+                <div class="example-box bad">
+                    <span class="label bad-label">❌ ผิด:</span>
+                    <div class="code-block" style="margin:5px 0; font-size:0.85em;">
+                        <span class="tag">&lt;h1&gt;</span>หัวเรื่อง 1<span class="tag">&lt;/h1&gt;</span><br>
+                        <span class="tag">&lt;p&gt;</span>เนื้อหา<span class="tag">&lt;/p&gt;</span><br>
+                        <span class="tag">&lt;h1&gt;</span>หัวเรื่อง 2<span class="tag">&lt;/h1&gt;</span>
+                    </div>
+                </div>
+                <div class="example-box good">
+                    <span class="label good-label">✅ ถูก:</span>
+                    <div class="code-block" style="margin:5px 0; font-size:0.85em;">
+                        <span class="tag">&lt;h1&gt;</span>หัวเรื่องหลัก<span class="tag">&lt;/h1&gt;</span><br>
+                        <span class="tag">&lt;h2&gt;</span>หัวเรื่องย่อย 1<span class="tag">&lt;/h2&gt;</span><br>
+                        <span class="tag">&lt;h2&gt;</span>หัวเรื่องย่อย 2<span class="tag">&lt;/h2&gt;</span>
+                    </div>
+                </div>
+            </div>
+
+            <h3>4. Not Using Labels with Form Inputs</h3>
+            <div class="example-grid">
+                <div class="example-box bad">
+                    <span class="label bad-label">❌ ผิด:</span>
+                    <div class="code-block" style="margin:5px 0; font-size:0.85em;">
+                        <span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="tag">/&gt;</span><br>
+                        <span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="string">"email"</span> <span class="tag">/&gt;</span>
+                    </div>
+                </div>
+                <div class="example-box good">
+                    <span class="label good-label">✅ ถูก:</span>
+                    <div class="code-block" style="margin:5px 0; font-size:0.85em;">
+                        <span class="tag">&lt;label</span> <span class="attr">for</span>=<span class="string">"name"</span><span class="tag">&gt;</span>ชื่อ:<span class="tag">&lt;/label&gt;</span><br>
+                        <span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">id</span>=<span class="string">"name"</span> <span class="tag">/&gt;</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-links">
+            <a href="#">นโยบายความเป็นส่วนตัว</a>
+            <a href="#">ข้อกำหนดการใช้งาน</a>
+            <a href="#">ติดต่อเรา</a>
+        </div>
+        <p class="credit">
+            <i class="fas fa-heart" style="color:#e74c3c;"></i> 
+            สร้างด้วย HTML5, CSS3 &amp; JavaScript
+        </p>
+    </footer>
+
+    <button class="scroll-top" id="scrollTopBtn" title="กลับด้านบน">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+
+    <script src="../script.js"></script>
+</body>
+</html>

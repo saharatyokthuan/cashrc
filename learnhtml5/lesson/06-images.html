@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="คู่มือการเขียน HTML ฉบับสมบูรณ์ - Image Elements">
+    <meta name="author" content="ผู้เรียน HTML">
+    <title>🌐 Image Elements | คู่มือ HTML</title>
+
+    <link rel="icon" href="../favicon.ico" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+    <header>
+        <h1>🌐 <span class="highlight">คู่มือการเขียน</span> HTML</h1>
+        <p class="subtitle">บทที่ 6 — Image Elements</p>
+        <nav>
+            <a href="../index.html"><i class="fas fa-list"></i> สารบัญ</a>
+            <a href="05-links.html"><i class="fas fa-arrow-left"></i> Link Elements</a>
+            <a href="07-lists.html">List Elements <i class="fas fa-arrow-right"></i></a>
+        </nav>
+    </header>
+
+    <main>
+<div id="images" class="section">
+            <h2><i class="fas fa-image"></i> Image Elements</h2>
+            <p class="description">Images ใช้สำหรับแสดงรูปภาพในหน้าเว็บ tag <code>&lt;img&gt;</code> เป็น void element (ไม่มี closing tag)</p>
+
+            <h3>Basic Image (รูปพื้นฐาน)</h3>
+            <div class="code-block">
+                <span class="tag">&lt;img</span> <span class="attr">src</span>=<span class="string">"image.jpg"</span> <span class="attr">alt</span>=<span class="string">"คำอธิบายรูป"</span> <span class="tag">/&gt;</span>
+            </div>
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>สำคัญ:</strong> ทั้ง <code>src</code> และ <code>alt</code> เป็นสิ่งจำเป็น:
+                <ul>
+                    <li><code>src</code>: เส้นทางไปยังไฟล์รูปภาพ</li>
+                    <li><code>alt</code>: คำอธิบายรูปสำหรับ accessibility และ SEO</li>
+                </ul>
+            </div>
+
+            <h3>Image with Size (รูปกับขนาด)</h3>
+            <div class="code-block">
+                <span class="tag">&lt;img</span> <span class="attr">src</span>=<span class="string">"image.jpg"</span> <span class="attr">alt</span>=<span class="string">"รูป"</span> <span class="attr">width</span>=<span class="string">"200"</span> <span class="attr">height</span>=<span class="string">"150"</span> <span class="tag">/&gt;</span>
+            </div>
+            <div class="alert alert-info">
+                <i class="fas fa-lightbulb"></i>
+                <strong>เคล็ดลับ:</strong> กำหนดขนาดช่วยบ่อกองค์ประกอบเปลี่ยนแปลงและป้องกัน Cumulative Layout Shift
+            </div>
+
+            <h3>Responsive Images (รูปแบบตอบสนอง)</h3>
+            <div class="code-block">
+                <span class="comment">&lt;!-- ใช้ srcset สำหรับรูปคุณภาพต่างกัน --&gt;</span><br>
+                <span class="tag">&lt;img</span><br>
+                &nbsp;&nbsp;<span class="attr">src</span>=<span class="string">"image-small.jpg"</span><br>
+                &nbsp;&nbsp;<span class="attr">srcset</span>=<span class="string">"image-medium.jpg 800w, image-large.jpg 1200w"</span><br>
+                &nbsp;&nbsp;<span class="attr">alt</span>=<span class="string">"คำอธิบายรูป"</span><br>
+                <span class="tag">/&gt;</span>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-links">
+            <a href="#">นโยบายความเป็นส่วนตัว</a>
+            <a href="#">ข้อกำหนดการใช้งาน</a>
+            <a href="#">ติดต่อเรา</a>
+        </div>
+        <p class="credit">
+            <i class="fas fa-heart" style="color:#e74c3c;"></i> 
+            สร้างด้วย HTML5, CSS3 &amp; JavaScript
+        </p>
+    </footer>
+
+    <button class="scroll-top" id="scrollTopBtn" title="กลับด้านบน">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+
+    <script src="../script.js"></script>
+</body>
+</html>

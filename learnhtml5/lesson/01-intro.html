@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="คู่มือการเขียน HTML ฉบับสมบูรณ์ - บทนำ HTML">
+    <meta name="author" content="ผู้เรียน HTML">
+    <title>🌐 บทนำ HTML | คู่มือ HTML</title>
+
+    <link rel="icon" href="../favicon.ico" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+    <header>
+        <h1>🌐 <span class="highlight">คู่มือการเขียน</span> HTML</h1>
+        <p class="subtitle">บทที่ 1 — บทนำ HTML</p>
+        <nav>
+            <a href="../index.html"><i class="fas fa-list"></i> สารบัญ</a>
+            
+            <a href="02-structure.html">โครงสร้างพื้นฐาน <i class="fas fa-arrow-right"></i></a>
+        </nav>
+    </header>
+
+    <main>
+<div id="intro" class="section">
+            <h2><i class="fas fa-home"></i> บทนำ HTML</h2>
+            <p class="description">
+                <strong>HTML (HyperText Markup Language)</strong> เป็นพื้นฐานของการสร้างเว็บเพจ 
+                มันเป็นภาษาที่ใช้สำหรับสร้างเนื้อหาและโครงสร้างของหน้าเว็บ รวมกับ 
+                <strong>CSS</strong> (สำหรับการออกแบบ) และ <strong>JavaScript</strong> (สำหรับการทำให้ใช้งานได้) 
+                ทำให้เราสามารถสร้างเว็บไซต์ที่สมบูรณ์ได้
+            </p>
+
+            <div id="what-is-html">
+                <h3><i class="fas fa-question-circle"></i> HTML คืออะไร</h3>
+                <div class="info-box">
+                    <p><strong>HTML</strong> ย่อมาจาก <strong>HyperText Markup Language</strong></p>
+                    <ul>
+                        <li><strong>HyperText</strong> = ข้อความที่มีลิงก์เชื่อมต่อไปยังข้อความอื่น ๆ</li>
+                        <li><strong>Markup</strong> = ภาษาที่ใช้เครื่องหมายพิเศษ (tags) เพื่อกำหนดโครงสร้าง</li>
+                        <li><strong>Language</strong> = ภาษาการสื่อสาร</li>
+                    </ul>
+                </div>
+
+                <h4>HTML ใช้สำหรับ</h4>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <i class="fas fa-file-alt"></i>
+                        <h4>สร้างเนื้อหา</h4>
+                        <p>Content</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-sitemap"></i>
+                        <h4>กำหนดโครงสร้าง</h4>
+                        <p>Structure</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-brain"></i>
+                        <h4>ให้ความหมาย</h4>
+                        <p>Semantics</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-link"></i>
+                        <h4>สร้างลิงก์</h4>
+                        <p>ระหว่างหน้าเว็บ</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="history">
+                <h3><i class="fas fa-history"></i> ประวัติความเป็นมา</h3>
+                <table class="info-table">
+                    <thead>
+                        <tr><th>เวอร์ชัน</th><th>ปี</th><th>ข้อเสริม</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>HTML</td><td>1989</td><td>เวอร์ชันแรก โดย Tim Berners-Lee</td></tr>
+                        <tr><td>HTML 2.0</td><td>1995</td><td>เพิ่ม form elements</td></tr>
+                        <tr><td>HTML 3.2</td><td>1997</td><td>เพิ่ม tables, applets</td></tr>
+                        <tr><td>HTML 4.01</td><td>1999</td><td>ปรับปรุง structure, frames</td></tr>
+                        <tr><td>XHTML 1.0</td><td>2000</td><td>XML-based version</td></tr>
+                        <tr><td><strong>HTML5</strong></td><td><strong>2014</strong></td><td><strong>เวอร์ชันปัจจุบัน</strong> เพิ่ม semantic tags, media, APIs</td></tr>
+                    </tbody>
+                </table>
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i>
+                    <strong>บทแนะนำนี้เป็นไปตามมาตรฐาน HTML5 ล่าสุด</strong>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-links">
+            <a href="#">นโยบายความเป็นส่วนตัว</a>
+            <a href="#">ข้อกำหนดการใช้งาน</a>
+            <a href="#">ติดต่อเรา</a>
+        </div>
+        <p class="credit">
+            <i class="fas fa-heart" style="color:#e74c3c;"></i> 
+            สร้างด้วย HTML5, CSS3 &amp; JavaScript
+        </p>
+    </footer>
+
+    <button class="scroll-top" id="scrollTopBtn" title="กลับด้านบน">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+
+    <script src="../script.js"></script>
+</body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="คู่มือการเขียน HTML ฉบับสมบูรณ์ - Text Elements">
+    <meta name="author" content="ผู้เรียน HTML">
+    <title>🌐 Text Elements | คู่มือ HTML</title>
+
+    <link rel="icon" href="../favicon.ico" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+    <header>
+        <h1>🌐 <span class="highlight">คู่มือการเขียน</span> HTML</h1>
+        <p class="subtitle">บทที่ 4 — Text Elements</p>
+        <nav>
+            <a href="../index.html"><i class="fas fa-list"></i> สารบัญ</a>
+            <a href="03-elements.html"><i class="fas fa-arrow-left"></i> HTML Elements และ Tags</a>
+            <a href="05-links.html">Link Elements <i class="fas fa-arrow-right"></i></a>
+        </nav>
+    </header>
+
+    <main>
+<div id="text" class="section">
+            <h2><i class="fas fa-font"></i> Text Elements</h2>
+            <p class="description">
+                Text Elements คือ tags ที่ใช้ในการจัดรูปแบบและกำหนดความหมายให้กับข้อความ 
+                นี่เป็นส่วนพื้นฐานของการสร้างเนื้อหา HTML
+            </p>
+
+            <h3>Headings (หัวข้อ)</h3>
+            <p>Headings ใช้สำหรับกำหนดลำดับชั้นของเนื้อหา มี 6 ระดับ (h1-h6) โดยที่ h1 เป็นหัวข้อหลัก:</p>
+            <div class="code-block">
+                <span class="tag">&lt;h1&gt;</span>หัวข้อระดับ 1<span class="tag">&lt;/h1&gt;</span><br>
+                <span class="tag">&lt;h2&gt;</span>หัวข้อระดับ 2<span class="tag">&lt;/h2&gt;</span><br>
+                <span class="tag">&lt;h3&gt;</span>หัวข้อระดับ 3<span class="tag">&lt;/h3&gt;</span>
+            </div>
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>สำคัญ:</strong> ใช้ h1 เพียง 1 อันต่อหน้า สำหรับ SEO และ Accessibility
+            </div>
+            <div class="alert alert-info">
+                <i class="fas fa-lightbulb"></i>
+                <strong>เคล็ดลับ:</strong> ลำดับการใช้ h tags ควรเป็นลำดับชั้น เช่น h1 → h2 → h3 ไม่ควรข้ามระดับ
+            </div>
+
+            <h3>Paragraph (ย่อหน้า)</h3>
+            <p>Tag <code>&lt;p&gt;</code> ใช้สำหรับกำหนดย่อหน้า โดยบราวเซอร์จะเพิ่มพื้นที่ว่างก่อน-หลังโดยอัตโนมัติ:</p>
+            <div class="code-block">
+                <span class="tag">&lt;p&gt;</span>นี่คือย่อหน้าแรก<span class="tag">&lt;/p&gt;</span><br>
+                <span class="tag">&lt;p&gt;</span>นี่คือย่อหน้าที่สอง<span class="tag">&lt;/p&gt;</span>
+            </div>
+
+            <h3>Text Formatting (จัดรูปแบบข้อความ)</h3>
+            <p>มีหลายวิธีในการจัดรูปแบบข้อความ แต่สำคัญที่สุดคือการเลือก tag ที่ถูกต้องตามความหมาย:</p>
+            <div class="code-block">
+                <span class="tag">&lt;b&gt;</span>ข้อความตัวหนา<span class="tag">&lt;/b&gt;</span>           <span class="comment">&lt;!-- Visual only --&gt;</span><br>
+                <span class="tag">&lt;strong&gt;</span>ข้อความสำคัญ<span class="tag">&lt;/strong&gt;</span>   <span class="comment">&lt;!-- Semantic (for screen reader) --&gt;</span><br>
+                <span class="tag">&lt;i&gt;</span>ข้อความเอียง<span class="tag">&lt;/i&gt;</span>            <span class="comment">&lt;!-- Visual only --&gt;</span><br>
+                <span class="tag">&lt;em&gt;</span>ข้อความที่เน้น<span class="tag">&lt;/em&gt;</span>         <span class="comment">&lt;!-- Semantic (emphasis) --&gt;</span><br>
+                <span class="tag">&lt;del&gt;</span>ลบออก<span class="tag">&lt;/del&gt;</span>              <span class="comment">&lt;!-- ข้อความที่ถูกลบ --&gt;</span><br>
+                <span class="tag">&lt;ins&gt;</span>เพิ่มเข้ามา<span class="tag">&lt;/ins&gt;</span>          <span class="comment">&lt;!-- ข้อความที่เพิ่มใหม่ --&gt;</span><br>
+                <span class="tag">&lt;mark&gt;</span>ไฮไลท์<span class="tag">&lt;/mark&gt;</span>            <span class="comment">&lt;!-- ทำเครื่องหมายข้อความ --&gt;</span><br>
+                <span class="tag">&lt;sub&gt;</span>ตัวห้อย<span class="tag">&lt;/sub&gt;</span>             <span class="comment">&lt;!-- Subscript (เช่น H₂O) --&gt;</span><br>
+                <span class="tag">&lt;sup&gt;</span>ตัวยก<span class="tag">&lt;/sup&gt;</span>              <span class="comment">&lt;!-- Superscript (เช่น x²) --&gt;</span>
+            </div>
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle"></i>
+                <strong>ดีที่สุด:</strong> ใช้ <code>&lt;strong&gt;</code> และ <code>&lt;em&gt;</code> แทน <code>&lt;b&gt;</code> และ <code>&lt;i&gt;</code> เพราะมี semantic meaning
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-links">
+            <a href="#">นโยบายความเป็นส่วนตัว</a>
+            <a href="#">ข้อกำหนดการใช้งาน</a>
+            <a href="#">ติดต่อเรา</a>
+        </div>
+        <p class="credit">
+            <i class="fas fa-heart" style="color:#e74c3c;"></i> 
+            สร้างด้วย HTML5, CSS3 &amp; JavaScript
+        </p>
+    </footer>
+
+    <button class="scroll-top" id="scrollTopBtn" title="กลับด้านบน">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+
+    <script src="../script.js"></script>
+</body>
+</html>

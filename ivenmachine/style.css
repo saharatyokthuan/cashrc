@@ -1,0 +1,1352 @@
+/* ============================================= */
+/* CSS Variables (ตัวแปรสีและค่าคงที่) */
+/* ============================================= */
+:root {
+    --primary-color: #1a7f37;
+    --primary-dark: #14612a;
+    --primary-light: #e8f5e9;
+    --secondary-color: #e61e25;
+    --secondary-dark: #b3161c;
+    --secondary-light: #ffebee;
+    --accent-color: #f59e0b;
+    --accent-light: #fef3c7;
+    --info-color: #3b82f6;
+    --info-light: #eff6ff;
+    --success-color: #10b981;
+    --success-light: #d1fae5;
+    --warning-color: #f59e0b;
+    --warning-light: #fef3c7;
+    --danger-color: #ef4444;
+    --danger-light: #fee2e2;
+    --text-primary: #1f2937;
+    --text-secondary: #4b5563;
+    --text-muted: #9ca3af;
+    --bg-body: #f4f6f9;
+    --bg-white: #ffffff;
+    --bg-light: #f8f9fa;
+    --border-color: #e5e7eb;
+    --border-radius-sm: 6px;
+    --border-radius-md: 10px;
+    --border-radius-lg: 16px;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --transition-fast: 0.15s ease-in-out;
+    --transition-normal: 0.3s ease-in-out;
+    --slot-min-width: 120px;
+    --slot-columns: 9;
+}
+
+/* ============================================= */
+/* CSS Reset & Base Styles (รีเซ็ตและสไตล์พื้นฐาน) */
+/* ============================================= */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Sarabun', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    background-color: var(--bg-body);
+    color: var(--text-primary);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+}
+
+a:hover {
+    color: var(--primary-dark);
+}
+
+ul,
+ol {
+    list-style: none;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+button {
+    font-family: inherit;
+    cursor: pointer;
+    border: none;
+    background: none;
+}
+
+input,
+select,
+textarea {
+    font-family: inherit;
+    font-size: 1rem;
+}
+
+/* ============================================= */
+/* Utility Classes (คลาสอเนกประสงค์) */
+/* ============================================= */
+.hidden {
+    display: none !important;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.mb-1 {
+    margin-bottom: 0.25rem;
+}
+
+.mb-2 {
+    margin-bottom: 0.5rem;
+}
+
+.mb-3 {
+    margin-bottom: 1rem;
+}
+
+.mb-4 {
+    margin-bottom: 1.5rem;
+}
+
+.mt-1 {
+    margin-top: 0.25rem;
+}
+
+.mt-2 {
+    margin-top: 0.5rem;
+}
+
+.mt-3 {
+    margin-top: 1rem;
+}
+
+.mt-4 {
+    margin-top: 1.5rem;
+}
+
+/* ============================================= */
+/* Scrollbar Styles (สไตล์แถบเลื่อน) */
+/* ============================================= */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-light);
+    border-radius: var(--border-radius-sm);
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: var(--border-radius-sm);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* ============================================= */
+/* Header Styles (สไตล์ส่วนหัว) */
+/* ============================================= */
+.main-header {
+    background-color: var(--bg-white);
+    box-shadow: var(--shadow-md);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    padding: 0.75rem 0;
+}
+
+.header-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.logo-icon {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    border-radius: var(--border-radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--bg-white);
+    font-size: 1.5rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.logo-text h1 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.2;
+    margin: 0;
+}
+
+.logo-text span {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+    display: block;
+}
+
+.import-export-controls {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.control-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--bg-light);
+    padding: 0.4rem 0.6rem;
+    border-radius: var(--border-radius-md);
+    border: 1px solid var(--border-color);
+}
+
+.group-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.btn-group {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0.5rem 0.9rem;
+    border-radius: var(--border-radius-sm);
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all var(--transition-fast);
+    border: 1px solid transparent;
+    white-space: nowrap;
+}
+
+.btn i {
+    font-size: 0.9rem;
+}
+
+.btn-import {
+    background-color: var(--bg-white);
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-import:hover {
+    background-color: var(--primary-light);
+    color: var(--primary-dark);
+}
+
+.btn-export {
+    background-color: var(--primary-color);
+    color: var(--bg-white);
+    border-color: var(--primary-color);
+}
+
+.btn-export:hover {
+    background-color: var(--primary-dark);
+    border-color: var(--primary-dark);
+}
+
+.btn-secondary {
+    background-color: var(--bg-white);
+    color: var(--text-secondary);
+    border-color: var(--border-color);
+}
+
+.btn-secondary:hover {
+    background-color: var(--bg-light);
+    color: var(--text-primary);
+}
+
+.btn-danger {
+    background-color: var(--danger-color);
+    color: var(--bg-white);
+    border-color: var(--danger-color);
+}
+
+.btn-danger:hover {
+    background-color: #dc2626;
+    border-color: #dc2626;
+}
+
+/* ปุ่ม Import .txt — ใช้สไตล์เดียวกับ .btn-import แต่เน้นขอบประเพื่อให้เด่น */
+.btn-import[for="import-txt"] {
+    background-color: var(--accent-light);
+    color: #92400e;
+    border-color: var(--accent-color);
+}
+
+.btn-import[for="import-txt"]:hover {
+    background-color: var(--accent-color);
+    color: var(--bg-white);
+    border-color: var(--accent-color);
+}
+
+/* ============================================= */
+/* Notification Bar (แถบแจ้งเตือน) */
+/* ============================================= */
+.notification-bar {
+    background-color: var(--info-light);
+    border-bottom: 1px solid #bfdbfe;
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 73px;
+    z-index: 999;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.notification-content {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #1e40af;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.notification-close {
+    color: #1e40af;
+    font-size: 1.1rem;
+    padding: 0.25rem;
+    border-radius: var(--border-radius-sm);
+    transition: background-color var(--transition-fast);
+}
+
+.notification-close:hover {
+    background-color: rgba(30, 64, 175, 0.1);
+}
+
+/* ============================================= */
+/* Main Container (คอนเทนเนอร์หลัก) */
+/* ============================================= */
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* ============================================= */
+/* Dashboard Section (ส่วนแดชบอร์ด) */
+/* ============================================= */
+.dashboard-section {
+    background-color: var(--bg-white);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-md);
+    padding: 1.5rem;
+    transition: box-shadow var(--transition-normal);
+}
+
+.dashboard-section:hover {
+    box-shadow: var(--shadow-lg);
+}
+
+.section-header {
+    margin-bottom: 1.25rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--bg-light);
+}
+
+.section-header h2 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.section-header h2 i {
+    color: var(--primary-color);
+    font-size: 1.1rem;
+}
+
+.section-description {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-top: 0.25rem;
+}
+
+/* ============================================= */
+/* Machine Overview (ภาพรวมเครื่อง) */
+/* ============================================= */
+.overview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.25rem;
+}
+
+.overview-card {
+    background-color: var(--bg-light);
+    border-radius: var(--border-radius-md);
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+}
+
+.overview-card-header {
+    background-color: var(--primary-color);
+    color: var(--bg-white);
+    padding: 0.75rem 1rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.overview-card-body {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.info-row,
+.status-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px dashed var(--border-color);
+    font-size: 0.9rem;
+}
+
+.info-row:last-child,
+.status-row:last-child {
+    border-bottom: none;
+}
+
+.info-label,
+.status-label {
+    color: var(--text-secondary);
+    font-weight: 500;
+    flex: 1;
+}
+
+.info-value {
+    color: var(--text-primary);
+    font-weight: 600;
+    text-align: right;
+    flex: 1;
+}
+
+.badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-align: center;
+    min-width: 80px;
+}
+
+.badge-success {
+    background-color: var(--success-light);
+    color: #065f46;
+}
+
+.badge-warning {
+    background-color: var(--warning-light);
+    color: #92400e;
+}
+
+.badge-danger {
+    background-color: var(--danger-light);
+    color: #991b1b;
+}
+
+.badge-info {
+    background-color: var(--info-light);
+    color: #1e40af;
+}
+
+/* ============================================= */
+/* Coin Refill Summary (สรุปเหรียญ) */
+/* ============================================= */
+.coin-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.25rem;
+}
+
+.coin-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    background-color: var(--bg-light);
+    border-radius: var(--border-radius-md);
+    padding: 1.25rem;
+    border: 1px solid var(--border-color);
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.coin-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.coin-card-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    color: var(--bg-white);
+    flex-shrink: 0;
+}
+
+.coin-card-icon.coin-1 {
+    background: linear-gradient(135deg, #fbbf24, #d97706);
+}
+
+.coin-card-icon.coin-5 {
+    background: linear-gradient(135deg, #9ca3af, #4b5563);
+}
+
+.coin-card-icon.coin-10 {
+    background: linear-gradient(135deg, #f59e0b, #b45309);
+}
+
+.coin-card-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.coin-card-content h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.coin-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.coin-stat-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+}
+
+.coin-stat-label {
+    color: var(--text-secondary);
+}
+
+.coin-stat-value {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.coin-stat-row.highlight {
+    background-color: var(--primary-light);
+    padding: 0.4rem 0.6rem;
+    border-radius: var(--border-radius-sm);
+    margin-top: 0.25rem;
+}
+
+.coin-stat-row.highlight .coin-stat-label {
+    color: var(--primary-dark);
+    font-weight: 600;
+}
+
+.coin-stat-row.highlight .refill-value {
+    color: var(--primary-color);
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background-color: var(--border-color);
+    border-radius: 50px;
+    overflow: hidden;
+    margin-top: 0.5rem;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-color), var(--success-color));
+    border-radius: 50px;
+    transition: width 0.5s ease-in-out;
+}
+
+/* ============================================= */
+/* Product Refill Summary (สรุปสินค้าที่ต้องเติม) */
+/* ============================================= */
+.summary-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.summary-stat-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background-color: var(--bg-light);
+    border-radius: var(--border-radius-md);
+    padding: 1rem;
+    border: 1px solid var(--border-color);
+}
+
+.summary-stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--border-radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    color: var(--bg-white);
+    flex-shrink: 0;
+}
+
+.summary-stat-icon.total {
+    background-color: var(--info-color);
+}
+
+.summary-stat-icon.warning {
+    background-color: var(--warning-color);
+}
+
+.summary-stat-icon.success {
+    background-color: var(--success-color);
+}
+
+.summary-stat-icon.info {
+    background-color: var(--accent-color);
+}
+
+.summary-stat-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.summary-stat-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.summary-stat-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+/* ============================================= */
+/* Data Table (ตารางข้อมูล) */
+/* ============================================= */
+.table-responsive {
+    overflow-x: auto;
+    border-radius: var(--border-radius-md);
+    border: 1px solid var(--border-color);
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    min-width: 800px;
+}
+
+.data-table thead {
+    background-color: var(--bg-light);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.data-table thead th {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    border-bottom: 2px solid var(--border-color);
+    white-space: nowrap;
+}
+
+.data-table tbody tr {
+    border-bottom: 1px solid var(--border-color);
+    transition: background-color var(--transition-fast);
+}
+
+.data-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.data-table tbody tr:hover {
+    background-color: var(--primary-light);
+}
+
+.data-table tbody td {
+    padding: 0.75rem 1rem;
+    color: var(--text-primary);
+    vertical-align: middle;
+}
+
+.data-table tbody td.col-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    max-width: 250px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.data-table tbody td.col-stock,
+.data-table tbody td.col-max,
+.data-table tbody td.col-refill {
+    text-align: center;
+    font-weight: 600;
+}
+
+.data-table tbody td.col-stock.negative {
+    color: var(--danger-color);
+    font-weight: 700;
+}
+
+.data-table tbody td.col-refill.highlight {
+    color: var(--primary-color);
+    font-weight: 700;
+    background-color: var(--primary-light);
+    border-radius: var(--border-radius-sm);
+}
+
+.empty-row td {
+    padding: 3rem 1rem;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.empty-row td i {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    display: block;
+    color: var(--border-color);
+}
+
+.table-footer {
+    margin-top: 0.75rem;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    text-align: right;
+}
+
+/* ============================================= */
+/* Machine Layout (แผนผังตู้) */
+/* ============================================= */
+.layout-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-bottom: 1.25rem;
+    padding: 0.75rem 1rem;
+    background-color: var(--bg-light);
+    border-radius: var(--border-radius-md);
+    border: 1px solid var(--border-color);
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.legend-color {
+    width: 20px;
+    height: 20px;
+    border-radius: var(--border-radius-sm);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.legend-full {
+    background-color: #d1fae5;
+}
+
+.legend-medium {
+    background-color: #fef3c7;
+}
+
+.legend-low {
+    background-color: #fed7aa;
+}
+
+.legend-empty {
+    background-color: #fee2e2;
+}
+
+.shelves-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-muted);
+    background-color: var(--bg-light);
+    border-radius: var(--border-radius-md);
+    border: 1px dashed var(--border-color);
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    display: block;
+    color: var(--border-color);
+}
+
+.empty-state p {
+    font-size: 0.9rem;
+}
+
+.shelf {
+    background-color: var(--bg-light);
+    border-radius: var(--border-radius-md);
+    padding: 1rem;
+    border: 1px solid var(--border-color);
+}
+
+.shelf h3 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.shelf h3 i {
+    color: var(--primary-color);
+}
+
+/* ============================================= */
+/* Slots Scroll Wrapper (ตัวห่อสำหรับเลื่อนแนวนอน) */
+/* ============================================= */
+.slots-scroll-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 0.5rem;
+    scrollbar-width: thin;
+    scrollbar-color: #c1c1c1 var(--bg-light);
+}
+
+.slots-scroll-wrapper::-webkit-scrollbar {
+    height: 8px;
+}
+
+.slots-scroll-wrapper::-webkit-scrollbar-track {
+    background: var(--bg-light);
+    border-radius: var(--border-radius-sm);
+}
+
+.slots-scroll-wrapper::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: var(--border-radius-sm);
+}
+
+.slots-scroll-wrapper::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* ============================================= */
+/* Slots Grid (กริดช่องวางสินค้า — 9 คอลัมน์ตายตัว) */
+/* ============================================= */
+.slots-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--slot-columns), minmax(var(--slot-min-width), 1fr));
+    gap: 0.75rem;
+    min-width: calc(var(--slot-columns) * var(--slot-min-width) + (var(--slot-columns) - 1) * 0.75rem);
+    padding: 0.25rem;
+}
+
+.slot-card {
+    background-color: var(--bg-white);
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+    display: flex;
+    flex-direction: column;
+}
+
+.slot-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.slot-card.slot-full {
+    background-color: #d1fae5;
+    border-color: #a7f3d0;
+}
+
+.slot-card.slot-medium {
+    background-color: #fef3c7;
+    border-color: #fde68a;
+}
+
+.slot-card.slot-low {
+    background-color: #fed7aa;
+    border-color: #fdba74;
+}
+
+.slot-card.slot-empty {
+    background-color: #fee2e2;
+    border-color: #fca5a5;
+}
+
+.slot-header {
+    background-color: rgba(0, 0, 0, 0.05);
+    padding: 0.35rem 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    text-align: center;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.slot-body {
+    padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    text-align: center;
+    flex: 1;
+    justify-content: space-between;
+}
+
+.product-name {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0;
+    min-height: 1.2em;
+}
+
+.product-price {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.product-stock {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+/* ============================================= */
+/* Master Product List (รายการสินค้าทั้งหมด) */
+/* ============================================= */
+.filters-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: flex-end;
+    margin-bottom: 1.25rem;
+    padding: 1rem;
+    background-color: var(--bg-light);
+    border-radius: var(--border-radius-md);
+    border: 1px solid var(--border-color);
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    flex: 1;
+    min-width: 180px;
+}
+
+.filter-group label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.filter-group label i {
+    color: var(--primary-color);
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    background-color: var(--bg-white);
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(26, 127, 55, 0.1);
+}
+
+.filter-actions {
+    flex: 0 0 auto;
+    min-width: auto;
+}
+
+/* ============================================= */
+/* Modal (หน้าต่างยืนยัน) */
+/* ============================================= */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.modal-content {
+    background-color: var(--bg-white);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-lg);
+    width: 90%;
+    max-width: 450px;
+    overflow: hidden;
+    animation: scaleIn 0.2s ease-out;
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.modal-header {
+    background-color: var(--danger-light);
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.modal-header i {
+    font-size: 1.25rem;
+    color: var(--danger-color);
+}
+
+.modal-header h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.modal-body {
+    padding: 1.25rem;
+}
+
+.modal-body p {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.modal-footer {
+    padding: 0.75rem 1.25rem;
+    background-color: var(--bg-light);
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+/* ============================================= */
+/* Footer (ส่วนท้าย) */
+/* ============================================= */
+.main-footer {
+    background-color: var(--bg-white);
+    border-top: 1px solid var(--border-color);
+    padding: 1rem 1.5rem;
+    margin-top: 2rem;
+}
+
+.footer-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.footer-version {
+    font-weight: 500;
+}
+
+/* ============================================= */
+/* Responsive Styles (สไตล์สำหรับหน้าจอขนาดต่างๆ) */
+/* ============================================= */
+
+/* Tablet (768px ลงมา) */
+@media screen and (max-width: 768px) {
+    .header-inner {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 0 1rem;
+    }
+
+    .import-export-controls {
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+    }
+
+    .control-group {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .btn-group {
+        flex: 1;
+        justify-content: flex-end;
+    }
+
+    .btn {
+        flex: 1;
+        justify-content: center;
+    }
+
+    .container {
+        padding: 1rem;
+    }
+
+    .dashboard-section {
+        padding: 1rem;
+    }
+
+    .overview-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .coin-cards-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .summary-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .filters-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filter-group {
+        min-width: 100%;
+    }
+
+    .filter-actions {
+        width: 100%;
+    }
+
+    .filter-actions .btn {
+        width: 100%;
+    }
+
+    .notification-bar {
+        top: 130px;
+    }
+
+    :root {
+        --slot-min-width: 100px;
+    }
+}
+
+/* Mobile (480px ลงมา) */
+@media screen and (max-width: 480px) {
+    .logo-text h1 {
+        font-size: 1rem;
+    }
+
+    .logo-text span {
+        font-size: 0.75rem;
+    }
+
+    .logo-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.25rem;
+    }
+
+    .btn {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.75rem;
+    }
+
+    .btn i {
+        font-size: 0.8rem;
+    }
+
+    .summary-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .coin-card {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .coin-card-content {
+        width: 100%;
+    }
+
+    .coin-stat-row {
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .data-table {
+        font-size: 0.75rem;
+    }
+
+    .data-table thead th,
+    .data-table tbody td {
+        padding: 0.5rem;
+    }
+
+    .slot-card .product-name {
+        font-size: 0.65rem;
+    }
+
+    .layout-legend {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .footer-inner {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    :root {
+        --slot-min-width: 90px;
+    }
+}

@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>POS-MOBILE</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<link rel="stylesheet" href="style-pos.css">
+</head>
+<body>
+<header class="header-app">
+  <div class="header-left">
+    <button class="header-btn" id="hamburger-btn" onclick="openMenu()" aria-label="เปิดเมนู" aria-expanded="false">
+      ☰
+    </button>
+  </div>
+  <div class="header-center" onclick="navigateFromMenu('pos')" role="button" aria-label="กลับหน้าแรก">
+    <h1 class="header-title">POS-MOBILE</h1>
+    <p class="header-subtitle" id="header-subtitle"></p>
+  </div>
+  <div class="header-right">
+   <button class="header-btn" id="setting-btn" onclick="openSetting()" aria-label="เปิดการตั้งค่า"aria-expanded="false">
+    ⚙️
+   </button>
+  </div>
+</header>
+
+<!-- ── SIDE MENU ─────────────────────────────── -->
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeMenu()"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <span class="sidebar-title">☰ เมนู</span>
+    <button class="btn-icon" onclick="closeMenu()" aria-label="ปิดเมนู">✕</button>
+  </div>
+  <nav class="sidebar-nav">
+    <button class="sidebar-link" onclick="navigateFromMenu('pos')">🛒 ขายสินค้า</button>
+    <button class="sidebar-link" onclick="navigateFromMenu('products')">📦 สินค้า</button>
+    <button class="sidebar-link" onclick="navigateFromMenu('purchase')">🚚 สั่งซื้อ</button>
+    <button class="sidebar-link" onclick="navigateFromMenu('debt')">💳 ลูกหนี้</button>
+    <button class="sidebar-link" onclick="navigateFromMenu('reports')">📊 รายงาน</button>
+    <button class="sidebar-link" onclick="navigateFromMenu('more')">⚙️ เพิ่มเติม / ตั้งค่า</button>
+  </nav>
+  <div class="sidebar-divider"></div>
+  <nav class="sidebar-nav">
+    <button class="sidebar-link" onclick="closeMenu();openExpense()">💸 บันทึกรายจ่าย</button>
+    <button class="sidebar-link" onclick="closeMenu();showSubPage('stock-adjust')">⚖️ ปรับสต๊อก</button>
+    <button class="sidebar-link" onclick="closeMenu();openHoldBillsPage()">🅿️ บิลพัก</button>
+    <button class="sidebar-link" onclick="closeMenu();exportBackupJSON()">💾 สำรองข้อมูลทั้งหมด</button>
+  </nav>
+</aside>
+
+<!-- ── TOP BAR ─────────────────────────────── -->
+<div id="topbar">
+  <span id="topbar-title"> 🛒 ขายสินค้า</span>
+  <span class="badge badge-teal" id="pos-bill-no" style="display:none">—</span>
+  <button class="btn btn-secondary btn-sm" id="topbar-action" style="display:none"></button>
+</div>
+
+<!-- ── PAGE CONTAINER ──────────────────────── -->
+<div id="page-container">
+
+  <div class="page active" id="page-pos">
+    <div id="pos-search-bar">
+      <div id="pos-search-wrap">
+        <input type="text" id="pos-search-input" placeholder="ชื่อ, รหัสสินค้า หรือ Barcode" oninput="filterPosProducts()" onkeydown="if(event.key==='Enter')addFirstResult()">
+        <button class="btn btn-secondary" id="pos-scan-btn" onclick="scanBarcode()" title="สแกนบาร์โค้ด (กล้องสด)">📷</button>
+        <button class="btn btn-secondary" id="pos-photo-btn" onclick="document.getElementById('pos-photo-input').click()" title="ถ่าย/เลือกรูปบาร์โค้ด">🖼️</button>
+        <input type="file" id="pos-photo-input" accept="image/*" capture="environment" style="display:none" onchange="scanBarcodeFromPhoto(event)">
+      </div>
+    </div>
+    <div id="pos-cat-scroll"></div>
+    <div id="pos-product-scroll">
+      <div class="product-grid" id="pos-product-grid"></div>
+    </div>
+  </div>
+
+
+  <div class="page" id="page-products">
+    <div class="page-body">
+      <div class="filter-row">
+        <input type="text" id="prod-search" placeholder="ค้นหา..." oninput="renderProducts()">
+        <select id="prod-cat-filter" onchange="renderProducts()">
+          <option value="">ทุกหมวด</option>
+        </select>
+        <select id="prod-type-filter" onchange="renderProducts()">
+          <option value="">ทุกประเภท</option>
+        </select>
+        <select id="prod-stock-filter" onchange="renderProducts()">
+          <option value="">สต๊อกทั้งหมด</option>
+          <option value="available">มีสต๊อก (ไม่หมด)</option>
+          <option value="low">ใกล้หมด</option>
+          <option value="out">หมดแล้ว</option>
+        </select>
+      </div>
+      <button class="btn btn-secondary" style="width:100%;margin-bottom:10px" onclick="openMasterSearch()">📋 เพิ่มจากรายการสินค้ากลาง (1,145 รายการ)</button>
+      <div id="prod-list"></div>
+    </div>
+  </div>
+
+
+  <div class="page" id="page-purchase">
+    <div class="page-body">
+      <div class="flex-between mb-14">
+        <span style="font-weight:600;font-size:15px">📥 รายการสั่งซื้อ</span>
+        <button class="btn btn-secondary btn-sm" onclick="exportPurchaseExcel()">📥 Excel</button>
+      </div>
+      <div class="date-row">
+        <span>จาก</span>
+        <input type="date" id="pur-date-from">
+        <span>ถึง</span>
+        <input type="date" id="pur-date-to">
+        <button class="btn btn-secondary btn-sm" onclick="renderPurchases()">ค้นหา</button>
+      </div>
+      <div id="pur-list"></div>
+    </div>
+  </div>
+
+
+  <div class="page" id="page-debt">
+    <div class="page-body">
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-label">ยอดค้างชำระ</div><div class="stat-value text-red" id="debt-outstanding">฿0</div></div>
+        <div class="stat-card"><div class="stat-label">บิลค้าง</div><div class="stat-value text-amber" id="debt-bill-count">0</div><div class="stat-sub">รายการ</div></div>
+      </div>
+      <div id="debt-list"></div>
+    </div>
+  </div>
+
+
+  <div class="page" id="page-reports">
+    <div class="page-body">
+      <div class="tabs" id="report-tabs">
+        <button class="tab-btn active" onclick="switchReportTab('sales')">ยอดขาย</button>
+        <button class="tab-btn" onclick="switchReportTab('stock')">สต๊อก</button>
+        <button class="tab-btn" onclick="switchReportTab('expense')">รายจ่าย</button>
+      </div>
+
+      <!-- Sales tab -->
+      <div id="rtab-sales">
+        <div class="quick-filter">
+          <button class="btn btn-secondary btn-sm" onclick="setDateRange('today','sale')">วันนี้</button>
+          <button class="btn btn-secondary btn-sm" onclick="setDateRange('week','sale')">7 วัน</button>
+          <button class="btn btn-secondary btn-sm" onclick="setDateRange('month','sale')">เดือนนี้</button>
+          <button class="btn btn-secondary btn-sm" onclick="setDateRange('year','sale')">ปีนี้</button>
+        </div>
+        <div class="date-row">
+          <span>จาก</span><input type="date" id="rep-sale-from">
+          <span>ถึง</span><input type="date" id="rep-sale-to">
+          <button class="btn btn-secondary btn-sm" onclick="renderSalesReport()">ค้นหา</button>
+        </div>
+        <div class="stat-grid">
+          <div class="stat-card"><div class="stat-label">ยอดขายรวม</div><div class="stat-value text-teal" id="rs-total">฿0</div></div>
+          <div class="stat-card"><div class="stat-label">กำไรรวม</div><div class="stat-value text-green" id="rs-profit">฿0</div></div>
+          <div class="stat-card"><div class="stat-label">จำนวนบิล</div><div class="stat-value" id="rs-bills">0</div></div>
+          <div class="stat-card"><div class="stat-label">เฉลี่ย/บิล</div><div class="stat-value" id="rs-avg">฿0</div></div>
+        </div>
+        <div class="chart-wrap"><canvas id="salesChart" height="140"></canvas></div>
+
+        <div style="font-weight:600;margin-bottom:10px;font-size:13px;margin-top:14px">🥧 ยอดขายแยกตามหมวดหมู่</div>
+        <div class="chart-wrap"><canvas id="categoryChart" height="180"></canvas></div>
+
+        <div style="font-weight:600;margin-bottom:10px;font-size:13px">🏆 สินค้าขายดี</div>
+        <div id="rs-top-list"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;margin-top:14px">
+          <span style="font-weight:600;font-size:13px">📥 รายละเอียดบิล</span>
+          <button class="btn btn-secondary btn-sm" onclick="exportSalesExcel()">📥</button>
+        </div>
+        <div id="rs-detail-list"></div>
+
+        <div style="font-weight:600;margin-bottom:10px;font-size:13px;margin-top:20px;padding-top:14px;border-top:1px solid var(--border)">📈 เปรียบเทียบยอดขายระหว่างช่วงเวลา</div>
+        <div class="quick-filter">
+          <button class="btn btn-secondary btn-sm" onclick="setCompareRange('mom')">เดือนนี้ vs เดือนก่อน</button>
+          <button class="btn btn-secondary btn-sm" onclick="setCompareRange('wow')">7วันนี้ vs 7วันก่อน</button>
+        </div>
+        <div class="date-row">
+          <span>ช่วง A</span><input type="date" id="cmp-a-from"><span>ถึง</span><input type="date" id="cmp-a-to">
+        </div>
+        <div class="date-row">
+          <span>ช่วง B</span><input type="date" id="cmp-b-from"><span>ถึง</span><input type="date" id="cmp-b-to">
+        </div>
+        <button class="btn btn-primary btn-sm btn-full" onclick="renderCompareReport()" style="margin-bottom:10px">📈 เปรียบเทียบ</button>
+        <div class="stat-grid" id="cmp-stats"></div>
+        <div class="chart-wrap"><canvas id="compareChart" height="140"></canvas></div>
+        <div style="display:flex;justify-content:flex-end;margin:10px 0">
+          <button class="btn btn-secondary btn-sm" onclick="exportCompareExcel()">📥 Export เปรียบเทียบ</button>
+        </div>
+      </div>
+
+      <!-- Stock tab -->
+      <div id="rtab-stock" style="display:none">
+        <div class="stat-grid">
+          <div class="stat-card"><div class="stat-label">สินค้าทั้งหมด</div><div class="stat-value" id="rst-total">0</div></div>
+          <div class="stat-card"><div class="stat-label">มูลค่าสต๊อก</div><div class="stat-value text-teal" id="rst-value">฿0</div></div>
+          <div class="stat-card"><div class="stat-label">ใกล้หมด</div><div class="stat-value text-amber" id="rst-low">0</div></div>
+          <div class="stat-card"><div class="stat-label">หมดแล้ว</div><div class="stat-value text-red" id="rst-out">0</div></div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+          <button class="btn btn-secondary btn-sm" onclick="exportStockExcel()">📥 Excel</button>
+        </div>
+        <div id="rst-list"></div>
+      </div>
+
+      <!-- Expense tab -->
+      <div id="rtab-expense" style="display:none">
+        <div class="quick-filter">
+          <button class="btn btn-secondary btn-sm" onclick="setDateRange('today','pur')">วันนี้</button>
+          <button class="btn btn-secondary btn-sm" onclick="setDateRange('week','pur')">7 วัน</button>
+          <button class="btn btn-secondary btn-sm" onclick="setDateRange('month','pur')">เดือนนี้</button>
+        </div>
+        <div class="date-row">
+          <span>จาก</span><input type="date" id="rep-pur-from">
+          <span>ถึง</span><input type="date" id="rep-pur-to">
+          <button class="btn btn-secondary btn-sm" onclick="renderPurchaseReport()">ค้นหา</button>
+        </div>
+        <div class="stat-grid">
+          <div class="stat-card"><div class="stat-label">ซื้อสินค้า</div><div class="stat-value text-red" id="rp-goods">฿0</div></div>
+          <div class="stat-card"><div class="stat-label">รายจ่ายทั่วไป</div><div class="stat-value text-amber" id="rp-expense">฿0</div></div>
+        </div>
+        <div class="stat-card mb-12"><div class="stat-label">รวมรายจ่าย</div><div class="stat-value" id="rp-total">฿0</div></div>
+        <div class="chart-wrap"><canvas id="purChart" height="140"></canvas></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <span style="font-weight:600;font-size:13px">📥 รายการ</span>
+          <button class="btn btn-secondary btn-sm" onclick="exportPurchaseRptExcel()">📥</button>
+        </div>
+        <div id="rp-list"></div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="page" id="page-more">
+    <div class="page-body">
+      <!-- Quick actions -->
+      <div class="card mb-12">
+        <div class="card-title">เมนูด่วน</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <button class="btn btn-secondary" onclick="openExpense()">💸 รายจ่าย</button>
+          <button class="btn btn-secondary" onclick="showSubPage('stock-adjust')">⚖️ ปรับสต๊อก</button>
+          <button class="btn btn-secondary" onclick="showPage('purchase')">🚚 สั่งซื้อ</button>
+          <button class="btn btn-secondary" onclick="openHoldBillsPage()">📌 บิลพัก</button>
+        </div>
+        <div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <button class="btn btn-secondary btn-full" onclick="document.getElementById('excelInput').click()">
+            📥 นำเข้า Excel Master Product
+          </button>
+          <button class="btn btn-secondary btn-full" onclick="exportProductsExcel()">📥 Export สินค้า</button>
+        </div>
+        <input type="file" id="excelInput" accept=".xlsx,.xls" style="display:none" onchange="importExcel(event)">
+        
+        <div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <button class="btn btn-secondary btn-full" onclick="document.getElementById('masterUpdateInput').click()">
+            🔄 อัพเดทชื่อ+หมวดหมู่
+          </button>
+          <button class="btn btn-secondary btn-full" onclick="exportBackupJSON()">🗄️ สำรองข้อมูลทั้งหมด</button>
+        </div>
+        <input type="file" id="masterUpdateInput" accept=".xlsx,.xls" style="display:none" onchange="importMasterUpdate(event)">
+
+        <div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <button class="btn btn-secondary btn-full" onclick="document.getElementById('backupInput').click()">🗄️ กู้คืนข้อมูล</button>
+        </div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:4px">💡 สำรองข้อมูลเก็บไว้เป็นระยะ เผื่อเบราว์เซอร์ล้างแคชหรือเปลี่ยนเครื่อง</div>
+        <input type="file" id="backupInput" accept=".json" style="display:none" onchange="importBackupJSON(event)">
+      </div>
+
+      <!-- ── CATEGORY MAPPING ── -->
+      <div class="card mb-12">
+        <div class="card-title mapping-card-header" onclick="toggleMappingCard()" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center">
+          <span>🏷️ หมวดหมู่สินค้า</span>
+          <span id="mapping-card-chevron" style="font-size:13px;color:var(--text-muted);transition:transform .15s">▾ กดเพื่อดู</span>
+        </div>
+        <div id="mapping-card-body" style="display:none;margin-top:12px">
+          <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px">
+            กำหนดว่ารหัสสินค้าที่ขึ้นต้นด้วยเลขอะไร ให้จัดอยู่ในหมวดหมู่ใด — กด 👁️ ที่แถวเพื่อซ่อนรายการที่ไม่ได้ใช้ (ไม่ลบข้อมูล แค่ซ่อนไว้)
+          </div>
+          <div id="mapping-list"></div>
+          <div class="mapping-add-row">
+            <input type="text" id="mapping-prefix" placeholder="รหัส เช่น 40" inputmode="numeric" maxlength="6" style="min-width:80px;flex:0.5">
+            <input type="text" id="mapping-cat" placeholder="ชื่อหมวดหมู่" style="flex:1">
+            <button class="btn btn-primary" onclick="addMapping()">➕ เพิ่ม</button>
+          </div>
+          <button class="btn btn-secondary btn-full" style="margin-top:10px" onclick="recalculateAllCategories()">🔄 ปรับปรุงหมวดหมู่สินค้าทั้งหมด</button>
+        </div>
+      </div>
+
+      <!-- Settings -->
+      <div class="card mb-12">
+        <div class="card-title">🏪 ข้อมูลร้านค้า</div>
+        <div class="form-group"><label>รหัสร้าน</label><input type="text" id="set-store-code"></div>
+        <div class="form-group"><label>ชื่อร้าน</label><input type="text" id="set-store-name"></div>
+        <div class="form-group"><label>ที่อยู่</label><textarea id="set-store-addr" rows="2"></textarea></div>
+        <div class="form-group"><label>เบอร์โทร</label><input type="text" id="set-store-phone"></div>
+        <div class="form-group"><label>Tax ID</label><input type="text" id="set-tax-id"></div>
+        <button class="btn btn-primary btn-full" onclick="saveSettings()">💾 บันทึก</button>
+      </div>
+      <div class="card mb-12">
+        <div class="card-title">ℹ️ ตั้งค่าระบบ</div>
+        <div class="form-group"><label>แจ้งเตือนสต๊อกต่ำกว่า</label><input type="number" id="set-low-stock" value="5"></div>
+        <div class="form-group"><label>แจ้งเตือนหมดอายุก่อน (วัน)</label><input type="number" id="set-expiry-days" value="30"></div>
+        <div class="form-group"><label>คำนวณ VAT 7%</label>
+          <select id="set-vat">
+            <option value="no">ไม่คิด VAT</option>
+            <option value="include">รวม VAT แล้ว</option>
+            <option value="exclude">บวก VAT เพิ่ม</option>
+          </select>
+        </div>
+        <button class="btn btn-primary btn-full" onclick="saveSettings()">💾 บันทึก</button>
+      </div>
+      <div class="card">
+        <div class="card-title" style="color:var(--red)">⚠️ อันตราย</div>
+        <button class="btn btn-danger btn-full" onclick="clearAllData()">🗑️ ล้างข้อมูลทั้งหมด</button>
+      </div>
+    </div>
+  </div>
+
+
+</div><!-- end page-container -->
+
+<!-- ── CART FAB ──────────────────────────────── -->
+<button id="cart-fab" onclick="openCartSheet()">
+  🛒
+  <span id="cart-count-badge">0</span>
+</button>
+
+<!-- ── BOTTOM NAV ─────────────────────────────── -->
+<nav id="bottom-nav">
+  <button class="nav-item" onclick="showPage('pos')" id="nav-pos">
+    <span class="nav-icon">🛒</span>
+    <span>ขาย</span>
+  </button>
+  <button class="nav-item" onclick="showPage('products')" id="nav-products">
+    <span class="nav-icon">📦</span>
+    <span>สินค้า</span>
+    <span class="nav-badge" id="nav-alert-badge"></span>
+  </button>
+  <button class="nav-item" onclick="showPage('debt')" id="nav-debt">
+    <span class="nav-icon">💳</span>
+    <span>ลูกหนี้</span>
+  </button>
+  <button class="nav-item" onclick="showPage('reports')" id="nav-reports">
+    <span class="nav-icon">📊</span>
+    <span>รายงาน</span>
+  </button>
+  <button class="nav-item" onclick="showPage('more')" id="nav-more">
+    <span class="nav-icon">☰</span>
+    <span>เพิ่มเติม</span>
+  </button>
+</nav>
+
+<!-- ── TOAST ─────────────────────────────────── -->
+<div id="toast-container"></div>
+
+<div id="cart-sheet" onclick="if(event.target===this)closeCartSheet()">
+  <div id="cart-panel">
+    <div class="cart-header">
+      <div class="modal-handle" style="margin:0"></div>
+      <span class="cart-header-title">🧾 รายการ</span>
+      <span class="badge badge-teal" id="cart-bill-badge">—</span>
+      <button class="btn-icon" onclick="clearCart()" title="ล้าง">🗑️</button>
+      <button class="btn-icon" onclick="closeCartSheet()">✕</button>
+    </div>
+    <div class="cart-items-list" id="cart-items-list"></div>
+    <div class="cart-summary">
+      <div class="sum-row"><span>รวม</span><span class="val" id="cs-subtotal">฿0.00</span></div>
+      <div class="sum-discount-row">
+        <span style="font-size:13px">ส่วนลด</span>
+        <div class="disc-inputs">
+          <input type="number" id="cs-discount-val" value="0" oninput="calcCart()" min="0">
+          <select id="cs-discount-type" onchange="calcCart()">
+            <option value="฿">฿</option>
+            <option value="%">%</option>
+          </select>
+        </div>
+      </div>
+      <div class="sum-row"><span style="font-size:12px;color:var(--text-muted)">VAT 7%</span><span class="val text-muted" id="cs-vat" style="font-size:12px">฿0.00</span></div>
+      <div class="sum-total-row"><span>ยอดรวม</span><span class="sum-total-val" id="cs-total">฿0.00</span></div>
+      <div class="cart-btn-row">
+        <button class="btn btn-secondary" onclick="addDebtSale()">💳 เชื่อ</button>
+        <button class="btn btn-secondary btn-sm" onclick="holdCurrentCart()">📌 พัก</button>
+        <button class="btn btn-primary" onclick="openPayment()" style="flex:2">💵 ชำระเงิน</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-payment" onclick="if(event.target===this)closeModal('modal-payment')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">💵 ชำระเงิน</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <span style="font-size:13px;color:var(--text-muted)">ยอดรวม</span>
+      <span style="font-family:var(--mono);font-size:22px;font-weight:700;color:var(--teal)" id="pay-total-display">฿0.00</span>
+    </div>
+    <div class="pay-type-row">
+      <button class="pay-type-btn active" id="pay-cash-btn" onclick="setPayType('เงินสด')"><span class="pay-icon">💵</span>เงินสด</button>
+      <button class="pay-type-btn" id="pay-transfer-btn" onclick="setPayType('โอน')"><span class="pay-icon">🏦</span>โอน</button>
+      <button class="pay-type-btn" id="pay-card-btn" onclick="setPayType('บัตร')"><span class="pay-icon">💳</span>บัตร</button>
+    </div>
+    <!-- Cash section -->
+    <div id="pay-cash-section">
+      <div class="pay-display" id="pay-received-display">0</div>
+      <div class="pay-change-row">ทอน: <span class="pay-change-val" id="pay-change-display">฿0.00</span></div>
+      <div class="quick-cash-row">
+        <button class="quick-cash-btn" onclick="quickCash(20)">+20</button>
+        <button class="quick-cash-btn" onclick="quickCash(50)">+50</button>
+        <button class="quick-cash-btn" onclick="quickCash(100)">+100</button>
+        <button class="quick-cash-btn" onclick="quickCash(500)">+500</button>
+        <button class="quick-cash-btn" onclick="quickCash(1000)">+1000</button>
+      </div>
+      <div class="payment-keypad">
+        <button class="key-btn" onclick="keyPad('7')">7</button>
+        <button class="key-btn" onclick="keyPad('8')">8</button>
+        <button class="key-btn" onclick="keyPad('9')">9</button>
+        <button class="key-btn" onclick="keyPad('4')">4</button>
+        <button class="key-btn" onclick="keyPad('5')">5</button>
+        <button class="key-btn" onclick="keyPad('6')">6</button>
+        <button class="key-btn" onclick="keyPad('1')">1</button>
+        <button class="key-btn" onclick="keyPad('2')">2</button>
+        <button class="key-btn" onclick="keyPad('3')">3</button>
+        <button class="key-btn" onclick="keyPad('.')">.</button>
+        <button class="key-btn" onclick="keyPad('0')">0</button>
+        <button class="key-btn" onclick="keyPad('00')">00</button>
+        <button class="key-btn key-clear" onclick="keyPad('C')">C</button>
+        <button class="key-btn key-back" onclick="keyPad('BACK')">⌫</button>
+      </div>
+      <button class="btn btn-primary btn-full key-enter-full" onclick="confirmPayment()">✅ ชำระ</button>
+    </div>
+    <!-- Transfer section -->
+    <div id="pay-transfer-section" style="display:none">
+      <div class="form-group"><label>ยอดโอน</label><input type="number" id="pay-transfer-amt" placeholder="0.00" inputmode="decimal"></div>
+      <div class="form-group"><label>หมายเหตุ</label><input type="text" id="pay-transfer-note" placeholder="เลขที่รายการ..."></div>
+      <button class="btn btn-primary btn-full" onclick="confirmPayment()">✅ ยืนยันการชำระ</button>
+    </div>
+    <div style="margin-top:12px">
+      <button class="btn btn-secondary btn-full" onclick="closeModal('modal-payment')">ยกเลิก</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-receipt" onclick="if(event.target===this)newBill()">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🧾 ใบเสร็จ</div>
+    <div id="receipt-content"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="printReceipt()">🖨️ พิมพ์</button>
+      <button class="btn btn-primary" onclick="newBill()">➕ บิลใหม่</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-hold" onclick="if(event.target===this)closeModal('modal-hold')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">📌 บิลพัก</div>
+    <div id="hold-bills-list"></div>
+    <div style="margin-top:12px"><button class="btn btn-secondary btn-full" onclick="closeModal('modal-hold')">ปิด</button></div>
+  </div>
+</div>
+
+
+<div class="modal-overlay" id="modal-product" onclick="if(event.target===this)closeModal('modal-product')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="prod-modal-title">➕ เพิ่มสินค้า</div>
+    <div class="form-group"><label>รหัสสินค้า (Master Product ID) *</label><input type="text" id="pm-product_id" placeholder="เช่น 4111505" oninput="autoFillProductInfo('id')"></div>
+    <div class="form-group">
+      <label>บาร์โค้ด (Barcode) *</label>
+      <div style="display:flex;gap:6px">
+        <input type="text" id="pm-barcode" placeholder="เช่น 8859733221136" inputmode="numeric" style="flex:1" oninput="autoFillProductInfo('barcode')">
+        <button type="button" class="btn btn-secondary" onclick="scanBarcodeToProductForm()" title="สแกนบาร์โค้ด (กล้องสด)">📷</button>
+        <button type="button" class="btn btn-secondary" onclick="document.getElementById('pm-photo-input').click()" title="ถ่าย/เลือกรูปบาร์โค้ด">🖼️</button>
+        <input type="file" id="pm-photo-input" accept="image/*" capture="environment" style="display:none" onchange="scanBarcodeFromPhotoToProductForm(event)">
+      </div>
+    </div>
+    <div class="form-group"><label>ชื่อสินค้า *</label><input type="text" id="pm-name"></div>
+    <div class="form-group"><label>หมวดหมู่ (Auto-fill ตามรหัส)</label>
+      <input type="text" id="pm-category" placeholder="จะถูกเติมอัตโนมัติตามรหัสสินค้า" readonly>
+      <div style="font-size:11px;color:var(--text-muted);margin-top:4px">💡 หมวดหมู่จะถูกเติมอัตโนมัติเมื่อกรอกรหัสสินค้า ตามที่ตั้งค่าในหน้า "เพิ่มเติม"</div>
+    </div>
+    <div class="form-group"><label>ประเภท</label>
+      <select id="pm-type"></select>
+    </div>
+    <div class="form-group"><label>ราคาขาย (บาท) *</label><input type="number" id="pm-price" inputmode="decimal" step="0.01" placeholder="0.00"></div>
+    <div class="form-group"><label>ราคาทุน (บาท)</label><input type="number" id="pm-cost" inputmode="decimal" step="0.01"></div>
+    <div class="form-group"><label>สต๊อก</label><input type="number" id="pm-stock" inputmode="numeric"></div>
+    <div class="form-group"><label>แจ้งเตือนสต๊อกต่ำกว่า</label><input type="number" id="pm-min-stock" inputmode="numeric"></div>
+    <div class="form-group"><label>วันหมดอายุ</label><input type="date" id="pm-expiry"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-product')">ยกเลิก</button>
+      <button class="btn btn-primary" onclick="saveProduct()">💾 บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-master-search" onclick="if(event.target===this)closeModal('modal-master-search')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">📋 รายการสินค้ากลาง</div>
+    <div class="form-group">
+      <input type="text" id="master-search" placeholder="ค้นหาชื่อ / รหัสสินค้า / บาร์โค้ด..." oninput="renderMasterSearch()">
+    </div>
+    <div id="master-search-list" style="max-height:55vh;overflow-y:auto"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-master-search')">ปิด</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-stock-adjust" onclick="if(event.target===this)closeModal('modal-stock-adjust')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">⚖️ ปรับสต๊อก</div>
+    <div class="form-group"><input type="text" id="adj-search" placeholder="ค้นหา..." oninput="renderAdjList()"></div>
+    <div id="adj-list" style="max-height:50vh;overflow-y:auto"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-stock-adjust')">ยกเลิก</button>
+      <button class="btn btn-primary" onclick="saveStockAdjust()">⚖️ บันทึก</button>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal-overlay" id="modal-purchase" onclick="if(event.target===this)closeModal('modal-purchase')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🚚 บันทึกสั่งซื้อ</div>
+    <div class="form-group"><label>วันที่</label><input type="date" id="pur-date"></div>
+    <div class="form-group"><label>ผู้จำหน่าย</label><input type="text" id="pur-supplier"></div>
+    <div id="pur-items-list"></div>
+    <button class="btn btn-secondary btn-full" onclick="addPurItem()" style="margin-bottom:8px">➕ เพิ่มรายการสินค้า</button>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-purchase')">ยกเลิก</button>
+      <button class="btn btn-primary" onclick="savePurchase()">💾 บันทึก</button>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal-overlay" id="modal-debt" onclick="if(event.target===this)closeModal('modal-debt')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="debt-modal-title">➕ เพิ่มลูกหนี้</div>
+    <div class="form-group"><label>ชื่อลูกค้า *</label><input type="text" id="dm-name"></div>
+    <div class="form-group"><label>เบอร์โทร</label><input type="text" id="dm-phone" inputmode="tel"></div>
+    <div class="form-group"><label>ยอดเงิน</label><input type="number" id="dm-amount" inputmode="decimal" step="0.01"></div>
+    <div class="form-group"><label>วันที่</label><input type="date" id="dm-date"></div>
+    <div class="form-group"><label>หมายเหตุ</label><input type="text" id="dm-note"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-debt')">ยกเลิก</button>
+      <button class="btn btn-primary" onclick="saveDebt()">💾 บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-pay-debt" onclick="if(event.target===this)closeModal('modal-pay-debt')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🧾 รับชำระหนี้</div>
+    <div class="form-group"><label>ชื่อลูกค้า</label><input type="text" id="pd-name" readonly></div>
+    <div class="form-group"><label>ยอดค้าง</label><input type="number" id="pd-outstanding" readonly></div>
+    <div class="form-group"><label>ยอดที่รับ</label><input type="number" id="pd-pay-amt" inputmode="decimal" step="0.01"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-pay-debt')">ยกเลิก</button>
+      <button class="btn btn-primary" onclick="confirmPayDebt()">✅ รับชำระ</button>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal-overlay" id="modal-expense" onclick="if(event.target===this)closeModal('modal-expense')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">💸 บันทึกรายจ่าย</div>
+    <div class="form-group"><label>รายการ</label><input type="text" id="exp-name" placeholder="ค่าน้ำ ค่าไฟ..."></div>
+    <div class="form-group"><label>จำนวนเงิน</label><input type="number" id="exp-amount" inputmode="decimal" step="0.01"></div>
+    <div class="form-group"><label>วันที่</label><input type="date" id="exp-date"></div>
+    <div class="form-group"><label>หมายเหตุ</label><input type="text" id="exp-note"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-expense')">ยกเลิก</button>
+      <button class="btn btn-primary" onclick="saveExpense()">💾 บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<script src="master-products.js"></script>
+<script src="script-pos.js"></script>
+</body>
+</html>
