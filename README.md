@@ -1,0 +1,2 @@
+# cashrc
+Created via Acode
